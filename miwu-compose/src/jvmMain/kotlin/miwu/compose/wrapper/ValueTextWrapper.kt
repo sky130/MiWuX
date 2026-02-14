@@ -17,13 +17,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import miwu.annotation.Wrapper
-import miwu.compose.wrapper.base.BaseMiwuWrapper
+import miwu.compose.wrapper.base.ComposeMiwuWrapper
 import miwu.support.base.MiwuWidget
 import miwu.ui.MiwuTheme
 import miwu.widget.StatusText
 
 @Wrapper(StatusText::class)
-class ValueTextWrapper(widget: MiwuWidget<Int>) : BaseMiwuWrapper<Int>(widget) {
+class ValueTextWrapper(widget: MiwuWidget<Int>) : ComposeMiwuWrapper<Int>(widget) {
     var text by mutableStateOf("")
     var unit by mutableStateOf("")
     var desc by mutableStateOf("")

@@ -1,10 +1,10 @@
 import org.gradle.kotlin.dsl.sourceSets
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.composeHotReload)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.compose.hotReload)
     alias(libs.plugins.ksp)
 }
 
@@ -16,11 +16,12 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(project(":miwu-common"))
-            implementation(compose.runtime)
-            implementation(compose.components.resources)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
+            implementation(libs.jetbrains.compose.runtime)
+            implementation(libs.jetbrains.compose.foundation)
+            implementation(libs.jetbrains.compose.material3)
+            implementation(libs.jetbrains.compose.ui)
+            implementation(libs.jetbrains.compose.components.resources)
+            implementation(libs.jetbrains.compose.ui.tooling.preview)
         }
         jvmMain.dependencies {
             implementation(libs.miwu.miot.api)
@@ -32,7 +33,7 @@ kotlin {
 
 
 dependencies {
-    ksp(libs.miwu.android.processor)
+    ksp(libs.miwu.support.processor)
     ksp(project(":miwu-compose-processor"))
 }
 

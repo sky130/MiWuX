@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,57 +18,50 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
+import com.github.miwu.route.Route
+import com.github.miwu.route.replaceCurrent
+import com.github.miwu.screen.main.viewModel.MainViewModel
+import com.github.miwu.widget.MiwuDivider
+import miwu.common.resources.*
 import miwu.ui.MiwuTheme
 import miwu.ui.miSansFontFamily
-import miwu.common.resources.*
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 
-val LocalTabNavController = compositionLocalOf<NavHostController> {
+val LocalMainSingleBackStack = compositionLocalOf<SnapshotStateList<Route>> {
     error("No LocalNavController provided")
 }
 
 var selectedIndex by mutableStateOf(0)
 
-fun startDestination(index: Int) = when (index) {
-    0 -> "home"
-    1 -> "device"
-    2 -> "scene"
-    3 -> "setting"
-    else -> "home"
-}
-
 @Composable
-fun MainScreen() {
-    val mainViewModel: MainViewModel = koinViewModel()
-    val navController = rememberNavController()
-    CompositionLocalProvider(LocalTabNavController provides navController) {
+fun MainScreen(mainViewModel: MainViewModel = koinViewModel()) {
+    val backStack: SnapshotStateList<Route> = remember { mutableStateListOf(Route.Main.entities[selectedIndex]) }
+    CompositionLocalProvider(LocalMainSingleBackStack provides backStack) {
         Box(
-            modifier = Modifier.fillMaxSize().background(MiwuTheme.colors.background)
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MiwuTheme.colors.background)
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                val controller = LocalTabNavController.current
-                NavHost(
-                    navController = controller,
-                    startDestination = startDestination(selectedIndex),
+            Column(modifier = Modifier.fillMaxSize()) {
+                val backStack = LocalMainSingleBackStack.current
+                NavDisplay(
+                    backStack = backStack,
                     modifier = Modifier.weight(1f)
-                ) {
-                    composable("home") { HomeScreen(mainViewModel) }
-                    composable("device") { DeviceScreen(mainViewModel) }
-                    composable("scene") { SceneScreen(mainViewModel) }
-                    composable("setting") { SettingScreen(mainViewModel) }
+                ) { key ->
+                    NavEntry(key = key, content = { key.Content() })
                 }
-                Column(modifier = Modifier.fillMaxWidth().height(1.dp).background(MiwuTheme.colors.divider)) { }
+                MiwuDivider()
                 Row(
-                    modifier = Modifier.fillMaxWidth().background(MiwuTheme.colors.surface).padding(11.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MiwuTheme.colors.surface)
+                        .padding(11.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
@@ -78,16 +72,22 @@ fun MainScreen() {
                     )
                     repeat(3) { idx ->
                         MiwuIcon(
-                            res = iconList[idx], selected = selectedIndex == idx, onClick = {
+                            res = iconList[idx],
+                            selected = selectedIndex == idx,
+                            onClick = {
                                 selectedIndex = idx
-                                navController.navigate(startDestination(idx))
-                            })
+                                backStack.replaceCurrent(Route.Main.entities[idx])
+                            }
+                        )
                     }
                     Spacer(Modifier.weight(1f))
                     MiwuIcon(
-                        res = Res.drawable.ic_setting, selected = selectedIndex == 3, onClick = {
+                        res = Res.drawable.ic_setting,
+                        selected = selectedIndex == 3,
+                        onClick = {
                             selectedIndex = 3
-                            navController.navigate(startDestination(3))
+                            backStack.removeLast()
+                            backStack.add(Route.Main.Setting)
                         }
                     )
                 }
@@ -99,28 +99,24 @@ fun MainScreen() {
 @Composable
 fun CardTitle(text: String) {
     BasicText(
-        text = text,
-        style = TextStyle(
+        text = text, style = TextStyle(
             color = MiwuTheme.colors.onSurface,
             fontFamily = miSansFontFamily,
             fontSize = 17.sp,
             fontWeight = FontWeight.Bold
-        ),
-        maxLines = 1
+        ), maxLines = 1
     )
 }
 
 @Composable
 fun CardSubtitle(text: String) {
     BasicText(
-        text = text,
-        style = TextStyle(
+        text = text, style = TextStyle(
             color = MiwuTheme.colors.onSurfaceVariant,
             fontSize = 14.sp,
             fontFamily = miSansFontFamily,
             fontWeight = FontWeight.Normal
-        ),
-        maxLines = 1
+        ), maxLines = 1
     )
 }
 

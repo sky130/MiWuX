@@ -1,69 +1,98 @@
 [versions]
-androidx-lifecycle = "2.9.1"
-composeHotReload = "1.0.0-beta04"
-composeMultiplatform = "1.8.2"
+androidx-lifecycle = "2.10.0-alpha08"
+compose-hotReload = "1.0.0-beta04"
+compose-multiplatform = "1.10.1"
 junit = "4.13.2"
-kotlin = "2.2.0"
+kotlin = "2.3.0"
 kotlinx-coroutines = "1.10.2"
-miwu = "92f6c69815"
+miwu = "3.0.0-dev-6"
 kotlinpoet = "2.2.0"
-ksp = "2.2.0-2.0.2"
+ksp = "2.3.5"
 koin-bom = "4.1.0"
 qrose = "1.0.1"
 resultat = "1.0.0"
 russhwolf-multiplatform-settings = "1.3.0"
-datastoreCoreJvm = "1.1.7"
-voyager = "1.1.0-beta03"
-gson = "2.13.1"
-symbolProcessingApi = "2.2.0-2.0.2"
-jetbrainsKotlinJvm = "2.2.0"
+datastore-core-jvm = "1.1.7"
+symbol-processing-api = "2.3.5"
+jetbrains-kotlin-jvm = "2.3.0"
+ktor = "3.4.0"
+lifecycle-viewmodel-navigation3 = "2.10.0-alpha08"
+coil = "3.3.0"
+navigation3-ui = "1.1.0-alpha02"
+compose = "1.10.1"
+compose-material3 = "1.9.0"
+navigation3-runtime-jvmstubs = "1.0.0-alpha06"
 
 [libraries]
-voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
-voyager-screenModel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
-voyager-bottomSheetNavigator = { module = "cafe.adriel.voyager:voyager-bottom-sheet-navigator", version.ref = "voyager" }
-voyager-tabNavigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
-voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
-voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voyager" }
-voyager-hilt = { module = "cafe.adriel.voyager:voyager-hilt", version.ref = "voyager" }
-voyager-kodein = { module = "cafe.adriel.voyager:voyager-kodein", version.ref = "voyager" }
-voyager-rxjava = { module = "cafe.adriel.voyager:voyager-rxjava", version.ref = "voyager" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
-junit = { module = "junit:junit", version.ref = "junit" }
-androidx-lifecycle-viewmodelCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
-androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
-miwu-miot-api = { module = "com.github.sky130.MiWu:miot-api", version.ref = "miwu" }
-miwu-miot-api-impl = { module = "com.github.sky130.MiWu:miot-api-impl", version.ref = "miwu" }
-miwu-support = { module = "com.github.sky130.MiWu:miwu-support", version.ref = "miwu" }
-miwu-support-annotation = { module = "com.github.sky130.MiWu:miwu-support-annotation", version.ref = "miwu" }
-miwu-android-processor = { module = "com.github.sky130.MiWu:miwu-android-processor", version.ref = "miwu" }
-miwu-support-processor = { module = "com.github.sky130.MiWu:miwu-support-processor", version.ref = "miwu" }
+
+
+junit = { module = "junit:junit", version.ref = "junit" }
+
+
+androidx-datastore-core-jvm = { group = "androidx.datastore", name = "datastore-core-jvm", version.ref = "datastore-core-jvm" }
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore-core-jvm" }
+
+
+miwu-miot-api = { module = "io.github.sky130.miwu:miot-api", version.ref = "miwu" }
+miwu-miot-api-impl = { module = "io.github.sky130.miwu:miot-api-impl", version.ref = "miwu" }
+miwu-miot-api-kmp-impl = { module = "io.github.sky130.miwu:miot-api-kmp-impl", version.ref = "miwu" }
+miwu-support = { module = "io.github.sky130.miwu:miwu-support", version.ref = "miwu" }
+miwu-support-annotation = { module = "io.github.sky130.miwu:miwu-support-annotation", version.ref = "miwu" }
+miwu-android-processor = { module = "io.github.sky130.miwu:miwu-icon-android-processor", version.ref = "miwu" }
+miwu-support-processor = { module = "io.github.sky130.miwu:miwu-support-processor", version.ref = "miwu" }
+
+
 squareup-kotlinpoet-ksp = { module = "com.squareup:kotlinpoet-ksp", version.ref = "kotlinpoet" }
+square-kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
+
+
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin-bom" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-bom" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin-bom" }
 koin-compose-viewmodel-navigation = { module = "io.insert-koin:koin-compose-viewmodel-navigation", version.ref = "koin-bom" }
+
+
 qrose = { module = "io.github.alexzhirkevich:qrose", version.ref = "qrose" }
 resultat = { module = "fr.haan.resultat:resultat", version.ref = "resultat" }
+
+
 russhwolf-multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "russhwolf-multiplatform-settings" }
 russhwolf-multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "russhwolf-multiplatform-settings" }
 russhwolf-multiplatform-settings-datastore = { module = "com.russhwolf:multiplatform-settings-datastore", version.ref = "russhwolf-multiplatform-settings" }
-androidx-datastore-core-jvm = { group = "androidx.datastore", name = "datastore-core-jvm", version.ref = "datastoreCoreJvm" }
-androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastoreCoreJvm" }
-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "symbolProcessingApi" }
-square-kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 
 
+symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "symbol-processing-api" }
+
+
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+
+
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
+
+jetbrains-androidx-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
+jetbrains-androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+jetbrains-androidx-lifecycle-viewmodel-nav3 = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle-viewmodel-navigation3" }
+jetbrains-androidx-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "navigation3-ui" }
+jetbrains-compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
+jetbrains-compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose" }
+jetbrains-compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-material3" }
+jetbrains-compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose" }
+jetbrains-compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose" }
+jetbrains-compose-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose" }
+androidx-navigation3-runtime-jvmstubs = { group = "androidx.navigation3", name = "navigation3-runtime-jvmstubs", version.ref = "navigation3-runtime-jvmstubs" }
 
 [plugins]
-composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
-composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
-composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+compose-hotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "compose-hotReload" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrains-kotlin-jvm" }
 
