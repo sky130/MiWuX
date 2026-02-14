@@ -17,12 +17,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import miwu.annotation.Wrapper
-import miwu.compose.wrapper.base.BaseMiwuWrapper
+import miwu.compose.wrapper.base.ComposeMiwuWrapper
 import miwu.support.base.MiwuWidget
 import miwu.ui.MiwuTheme
 
 @Wrapper(miwu.widget.Text::class)
-class TextWrapper(widget: MiwuWidget<String>) : BaseMiwuWrapper<String>(widget) {
+class TextWrapper(widget: MiwuWidget<String>) : ComposeMiwuWrapper<String>(widget) {
     var text by mutableStateOf("")
     var unit by mutableStateOf("")
     var desc by mutableStateOf("")

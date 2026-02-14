@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontFamily
  * @param onSurfaceVariant 表面上的次要文字颜色
  */
 data class MiwuColorScheme(
-    val primary: Color = Color(0xFF57D1B8),
+    val primary: Color = Color(0xFF00BD9D),
     val secondary: Color = Color(0xFFB0B6C2),
     val divider: Color = Color(0xFFE0EBF3),
     val background: Color = Color(0xFFF3F6FD),

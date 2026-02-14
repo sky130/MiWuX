@@ -1,4 +1,4 @@
-package com.github.miwu.screen.main
+package com.github.miwu.screen.main.screen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -13,21 +13,23 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.github.miwu.LocalRootNavController
-import com.github.miwu.screen.device.Device
-import miwu.ui.MiwuTheme
+import com.github.miwu.LocalRootNavBackStack
+import com.github.miwu.route.Route
+import com.github.miwu.screen.main.CardSubtitle
+import com.github.miwu.screen.main.CardTitle
+import com.github.miwu.screen.main.viewModel.MainViewModel
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.ExperimentalSettingsImplementation
-import miwu.miot.helper.MiotIconHelper
+import fr.haan.resultat.Resultat
+import miwu.ui.MiwuTheme
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(
     ExperimentalSettingsApi::class,
@@ -36,18 +38,33 @@ import miwu.miot.helper.MiotIconHelper
     ExperimentalMaterialApi::class
 )
 @Composable
-fun DeviceScreen(viewModel: MainViewModel) {
-    val navController = LocalRootNavController.current
+fun DeviceScreen(viewModel: MainViewModel = koinViewModel()) {
+    val backStack = LocalRootNavBackStack.current
+    val deviceList by viewModel.deviceList.collectAsState()
+    val miotUser by viewModel.miotUser.collectAsState()
+    when (deviceList) {
+        is Resultat.Failure -> {
+            /** TODO **/
+            return
+        }
+
+        is Resultat.Loading -> {
+            /** TODO **/
+            return
+        }
+
+        else -> Unit
+    }
     LazyVerticalGrid(
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalArrangement = Arrangement.spacedBy(5.dp),
         modifier = Modifier.padding(start = 10.dp, end = 10.dp),
         columns = GridCells.Adaptive(minSize = 150.dp)
     ) {
-        items(viewModel.deviceList) { device ->
+        items(deviceList.getOrNull().orEmpty()) { (device, _, icon) ->
             Surface(
                 onClick = {
-                    navController.navigate(Device(device))
+                    backStack.add(Route.Device(miotUser, device))
                 },
                 modifier = Modifier
                     .fillMaxSize()
@@ -55,11 +72,7 @@ fun DeviceScreen(viewModel: MainViewModel) {
                 color = MiwuTheme.colors.surface
             ) {
                 Column(modifier = Modifier.padding(15.dp)) {
-                    var iconUrl by remember { mutableStateOf("") }
-                    LaunchedEffect(Unit) {
-                        iconUrl = MiotIconHelper.getIconUrl(device.model).toString()
-                    }
-                    AsyncImage(model = iconUrl, contentDescription = null, modifier = Modifier.size(35.dp))
+                    AsyncImage(model = icon, contentDescription = null, modifier = Modifier.size(35.dp))
                     CardTitle(device.name)
                     CardSubtitle("设备在线")
                 }

@@ -1,11 +1,11 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.composeCompiler)
-    // alias(libs.plugins.composeHotReload)
-    kotlin("plugin.serialization") version "2.2.0"
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.compose.hotReload)
+    kotlin("plugin.serialization") version "2.3.0"
 }
 
 kotlin {
@@ -13,35 +13,41 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(project(":miwu-common"))
+            implementation(project(":miwu-compose"))
+
+
+            implementation(libs.jetbrains.compose.runtime)
+            implementation(libs.jetbrains.compose.foundation)
+            implementation(libs.jetbrains.compose.material3)
+            implementation(libs.jetbrains.compose.ui)
+            implementation(libs.jetbrains.compose.components.resources)
+            implementation(libs.jetbrains.compose.ui.tooling.preview)
+            implementation(libs.jetbrains.androidx.lifecycle.viewmodel.compose)
+            implementation(libs.jetbrains.androidx.lifecycle.runtime.compose)
+            implementation(libs.jetbrains.androidx.lifecycle.viewmodel.nav3)
+
+
+            implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
-            implementation(libs.koin.compose.viewmodel.navigation)
             implementation(libs.koin.core)
+
+
             implementation(libs.resultat)
             implementation(libs.russhwolf.multiplatform.settings)
             implementation(libs.russhwolf.multiplatform.settings.coroutines)
             implementation(libs.russhwolf.multiplatform.settings.datastore)
-            implementation(project.dependencies.platform(libs.koin.bom))
+
+
             implementation(libs.androidx.datastore.preferences)
-            implementation("io.coil-kt.coil3:coil-compose:3.3.0")
-            implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
-            // implementation(libs.voyager.navigator)
-            // implementation(libs.voyager.screenModel)
-            // implementation(libs.voyager.bottomSheetNavigator)
-            // implementation(libs.voyager.transitions)
-            // implementation(libs.voyager.koin)
-            implementation(project(":miwu-common"))
-            implementation(project(":miwu-compose"))
-            implementation("org.jetbrains.androidx.navigation:navigation-compose:2.9.0-beta05")
-        }
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.okhttp)
+            implementation(libs.jetbrains.androidx.navigation3.ui)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+       }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
@@ -50,11 +56,11 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
             implementation(libs.qrose)
-            implementation(libs.gson)
             implementation(libs.miwu.miot.api)
-            implementation(libs.miwu.miot.api.impl)
+            implementation(libs.miwu.miot.api.kmp.impl)
             implementation(libs.miwu.support)
             implementation(libs.miwu.support.annotation)
+            // implementation(libs.androidx.navigation3.runtime.jvmstubs)
             // implementation(libs.miwu.support.processor)
         }
     }
