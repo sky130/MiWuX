@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.compose.hotReload)
+    // alias(libs.plugins.compose.hotReload)
     kotlin("plugin.serialization") version "2.3.0"
 }
 
@@ -19,7 +19,8 @@ kotlin {
 
             implementation(libs.jetbrains.compose.runtime)
             implementation(libs.jetbrains.compose.foundation)
-            implementation(libs.jetbrains.compose.material3)
+            // implementation(libs.jetbrains.compose.material3)
+            implementation(libs.jetbrains.compose.animation)
             implementation(libs.jetbrains.compose.ui)
             implementation(libs.jetbrains.compose.components.resources)
             implementation(libs.jetbrains.compose.ui.tooling.preview)
@@ -47,11 +48,12 @@ kotlin {
             implementation(libs.jetbrains.androidx.navigation3.ui)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
-       }
+        }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
         jvmMain.dependencies {
+
             implementation(libs.androidx.datastore.core.jvm)
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)

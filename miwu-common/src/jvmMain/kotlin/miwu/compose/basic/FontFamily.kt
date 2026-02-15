@@ -1,4 +1,4 @@
-package miwu.ui
+package miwu.compose.basic
 
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.platform.Font

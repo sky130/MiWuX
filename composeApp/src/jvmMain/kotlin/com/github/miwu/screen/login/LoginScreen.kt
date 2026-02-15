@@ -1,32 +1,28 @@
 package com.github.miwu.screen.login
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.github.miwu.LocalGlobalSnackState
 import fr.haan.resultat.onSuccess
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import miwu.common.resources.Res
-import miwu.common.resources.ic_miwu
 import miwu.common.resources.ic_miwu_round
-import miwu.common.resources.ic_miwu_with_bg
-import miwu.ui.MiwuTheme
-import org.jetbrains.compose.resources.imageResource
+import miwu.compose.Text
+import miwu.compose.Title
+import miwu.compose.basic.MiwuTheme
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -34,6 +30,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun LoginScreen(
     loginViewModel: LoginViewModel = koinViewModel()
 ) {
+    val snackState = LocalGlobalSnackState.current
     LaunchedEffect(Unit) {
         loginViewModel.loadQrCode()
     }
@@ -41,11 +38,11 @@ fun LoginScreen(
         loginViewModel.event.collect { event ->
             when (event) {
                 is LoginViewModel.Event.LoginFailure -> {
-                    // TODO 这里弹出一个 toast 之类的东西
+                    snackState.showMessage(event.e.message ?: "登录失败")
                 }
 
                 is LoginViewModel.Event.LoginSuccess -> {
-                    // App 入口那里会处理登录，这里弹出一个 toast
+                    snackState.showMessage("登录成功")
                 }
 
                 is LoginViewModel.Event.ShowLoading -> Unit
@@ -58,20 +55,31 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(9.dp)
         ) {
+            var counter by remember { mutableStateOf(0) }
             Image(
                 painterResource(Res.drawable.ic_miwu_round),
                 null,
-                modifier = Modifier.size(72.dp)
+                modifier = Modifier.size(72.dp).clickable {
+                    counter++
+                    snackState.showMessage("Hello $counter")
+                }
             )
-            // Text("MiWuX", fontWeight = FontWeight(800), fontSize = 20.sp)
+            Title {
+                Text("扫码登录")
+            }
             Text("使用小米账号登录至米屋")
             loginViewModel.qrcode.onSuccess {
-                Image(
-                    painter = rememberQrCodePainter(it),
-                    contentDescription = null
-                )
+                Box(Modifier.border(2.dp, MiwuTheme.colors.border, RoundedCornerShape(10.dp))) {
+                    Image(
+                        painter = rememberQrCodePainter(it),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(15.dp)
+                            .size(200.dp)
+                    )
+                }
             }
-            Row {
+            FlowRow {
                 Text("登录后默认已同意")
                 Text("免责声明", color = MiwuTheme.colors.primary)
             }

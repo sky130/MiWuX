@@ -31,10 +31,18 @@ kotlin {
     }
 }
 
-
-dependencies {
-    ksp(libs.miwu.support.processor)
-    ksp(project(":miwu-compose-processor"))
+ksp {
+    arg("miwu.spec.enabled", "true")
 }
 
+dependencies {
+    ksp(project(":miwu-compose-processor"))
+    ksp(libs.miwu.support.processor)
+}
+
+afterEvaluate {
+    tasks.named("compileKotlinJvm") {
+        dependsOn("kspKotlinJvm")
+    }
+}
 

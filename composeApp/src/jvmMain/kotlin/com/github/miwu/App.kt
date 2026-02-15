@@ -1,5 +1,6 @@
 package com.github.miwu
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
@@ -15,11 +16,18 @@ import com.github.miwu.logic.state.LoginState
 import com.github.miwu.route.Route
 import com.github.miwu.route.replaceCurrent
 import com.github.miwu.screen.device.ComposeTranslateHelper
-import miwu.ui.MiwuTheme
+import miwu.compose.SnackHost
+import miwu.compose.SnackState
+import miwu.compose.rememberSnackState
+import miwu.compose.basic.MiwuTheme
 import org.koin.compose.koinInject
 
 val LocalRootNavBackStack = compositionLocalOf<SnapshotStateList<Route>> {
     error("No LocalNavController provided")
+}
+
+val LocalGlobalSnackState = compositionLocalOf<SnackState> {
+    error("No SnackState provided")
 }
 
 @Composable
@@ -31,6 +39,7 @@ fun App(
         ComposeTranslateHelper.init()
     }
     MiwuTheme(isDarkMode = false) {
+        val snackState = rememberSnackState()
         val backStack: SnapshotStateList<Route> = remember { mutableStateListOf(Route.Blank) }
         LaunchedEffect(Unit) {
             appRepository.loginStatus.collect { loginState ->
@@ -44,8 +53,11 @@ fun App(
                 }
             }
         }
-        CompositionLocalProvider(LocalRootNavBackStack provides backStack) {
-            Box(Modifier.fillMaxSize()) {
+        CompositionLocalProvider(
+            LocalRootNavBackStack provides backStack,
+            LocalGlobalSnackState provides snackState
+        ) {
+            Box(Modifier.fillMaxSize().background(MiwuTheme.colors.background)) {
                 NavDisplay(
                     backStack = backStack,
                     onBack = { backStack.removeLast() },
@@ -57,6 +69,7 @@ fun App(
                 ) { key ->
                     NavEntry(key) { key.Content() }
                 }
+                SnackHost(snackState, Modifier.fillMaxSize())
             }
         }
     }

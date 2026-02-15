@@ -15,7 +15,6 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
@@ -28,7 +27,7 @@ import com.github.miwu.screen.main.viewModel.MainViewModel
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.ExperimentalSettingsImplementation
 import fr.haan.resultat.Resultat
-import miwu.ui.MiwuTheme
+import miwu.compose.basic.MiwuTheme
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(
