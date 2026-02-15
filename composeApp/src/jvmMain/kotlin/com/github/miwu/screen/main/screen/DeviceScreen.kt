@@ -22,12 +22,15 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.github.miwu.LocalRootNavBackStack
 import com.github.miwu.route.Route
-import com.github.miwu.screen.main.CardSubtitle
-import com.github.miwu.screen.main.CardTitle
+//import com.github.miwu.screen.main.CardSubtitle
+//import com.github.miwu.screen.main.CardTitle
 import com.github.miwu.screen.main.viewModel.MainViewModel
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.ExperimentalSettingsImplementation
 import fr.haan.resultat.Resultat
+import miwu.compose.Label
+import miwu.compose.Text
+import miwu.compose.Title
 import miwu.compose.basic.MiwuTheme
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -74,8 +77,14 @@ fun DeviceScreen(viewModel: MainViewModel = koinViewModel()) {
             ) {
                 Column(modifier = Modifier.padding(15.dp)) {
                     AsyncImage(model = icon, contentDescription = null, modifier = Modifier.size(35.dp))
-                    CardTitle(device.name)
-                    CardSubtitle("设备在线")
+                    Title {
+                        Text(device.name)
+                    }
+                    Label {
+                        Text("设备在线")
+                    }
+//                    CardTitle(device.name)
+//                    CardSubtitle("设备在线")
                 }
             }
         }

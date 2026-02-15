@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
-    // alias(libs.plugins.compose.hotReload)
+    alias(libs.plugins.compose.hotReload)
     kotlin("plugin.serialization") version "2.3.0"
 }
 
@@ -53,7 +53,7 @@ kotlin {
             implementation(libs.kotlin.test)
         }
         jvmMain.dependencies {
-            implementation(libs.androidx.ui.desktop)
+            // implementation(libs.androidx.ui.desktop)
             implementation(libs.androidx.datastore.core.jvm)
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
