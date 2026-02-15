@@ -1,6 +1,7 @@
 package com.github.miwu.screen.main.screen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -67,7 +68,8 @@ fun DeviceScreen(viewModel: MainViewModel = koinViewModel()) {
                 },
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(10.dp)),
+                    .clip(RoundedCornerShape(10.dp))
+                    .border(1.dp, MiwuTheme.colors.border, RoundedCornerShape(10.dp)),
                 color = MiwuTheme.colors.surface
             ) {
                 Column(modifier = Modifier.padding(15.dp)) {

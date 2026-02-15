@@ -53,7 +53,7 @@ kotlin {
             implementation(libs.kotlin.test)
         }
         jvmMain.dependencies {
-
+            implementation(libs.androidx.ui.desktop)
             implementation(libs.androidx.datastore.core.jvm)
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
