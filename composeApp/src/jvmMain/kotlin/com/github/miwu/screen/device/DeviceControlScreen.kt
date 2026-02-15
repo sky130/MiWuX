@@ -8,7 +8,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -23,13 +22,15 @@ import com.github.miwu.LocalRootNavBackStack
 import com.github.miwu.screen.device.DeviceViewModel.Event.DeviceInitiated
 import miwu.common.resources.Res
 import miwu.common.resources.ic_return
+import miwu.compose.Text
+import miwu.compose.Title
 import miwu.compose.wrapper.base.ComposeMiwuWrapper
 import miwu.miot.model.MiotUser
 import miwu.miot.model.miot.MiotDevice
 import miwu.support.base.MiwuWidget
 import miwu.support.base.MiwuWrapper
 import miwu.support.manager.MiotDeviceManager
-import miwu.ui.MiwuTheme
+import miwu.compose.basic.MiwuTheme
 import miwu.widget.generated.wrapper.WrapperRegistry
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -114,14 +115,12 @@ fun TitleBar(device: MiotDevice, onBack: () -> Unit = {}) {
             }
         }
 
-        Text(
-            text = device.name,
-            color = MiwuTheme.colors.onSurface,
-            modifier = Modifier.wrapContentHeight().weight(1f).align(Alignment.CenterVertically),
-            fontFamily = MiwuTheme.fontFamily,
-            fontWeight = FontWeight(600),
-            fontSize = 19.sp,
-        )
+        Title {
+            Text(
+                text = device.name,
+                modifier = Modifier.wrapContentHeight().weight(1f).align(Alignment.CenterVertically),
+            )
+        }
     }
 }
 

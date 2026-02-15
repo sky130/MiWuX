@@ -28,6 +28,8 @@ class MainViewModel() : ViewModel(), KoinComponent {
 
     val homeList = appRepository.homes
 
+    val userInfo = appRepository.userInfo
+
     val miotUser = miotUserDataStore.data.stateIn(
         viewModelScope,
         SharingStarted.Eagerly,

@@ -3,8 +3,10 @@ package com.github.miwu.screen.main
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.*
@@ -19,15 +21,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation3.runtime.NavEntry
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import coil3.compose.AsyncImage
 import com.github.miwu.route.Route
 import com.github.miwu.route.replaceCurrent
 import com.github.miwu.screen.main.viewModel.MainViewModel
-import com.github.miwu.widget.MiwuDivider
+import miwu.compose.Divider
 import miwu.common.resources.*
-import miwu.ui.MiwuTheme
-import miwu.ui.miSansFontFamily
+import miwu.compose.basic.MiwuTheme
+import miwu.compose.basic.miSansFontFamily
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -40,7 +42,8 @@ val LocalMainSingleBackStack = compositionLocalOf<SnapshotStateList<Route>> {
 var selectedIndex by mutableStateOf(0)
 
 @Composable
-fun MainScreen(mainViewModel: MainViewModel = koinViewModel()) {
+fun MainScreen(viewModel: MainViewModel = koinViewModel()) {
+    val userInfo by viewModel.userInfo.collectAsState()
     val backStack: SnapshotStateList<Route> = remember { mutableStateListOf(Route.Main.entities[selectedIndex]) }
     CompositionLocalProvider(LocalMainSingleBackStack provides backStack) {
         Box(
@@ -56,7 +59,7 @@ fun MainScreen(mainViewModel: MainViewModel = koinViewModel()) {
                 ) { key ->
                     NavEntry(key = key, content = { key.Content() })
                 }
-                MiwuDivider()
+                Divider()
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -81,15 +84,20 @@ fun MainScreen(mainViewModel: MainViewModel = koinViewModel()) {
                         )
                     }
                     Spacer(Modifier.weight(1f))
-                    MiwuIcon(
-                        res = Res.drawable.ic_setting,
-                        selected = selectedIndex == 3,
-                        onClick = {
-                            selectedIndex = 3
-                            backStack.removeLast()
-                            backStack.add(Route.Main.Setting)
-                        }
-                    )
+                    MiwuImage(userInfo.avatar, selected = selectedIndex == 3, onClick = {
+                        selectedIndex = 3
+                        backStack.removeLast()
+                        backStack.add(Route.Main.Setting)
+                    })
+//                    MiwuIcon(
+//                        res = Res.drawable.ic_setting,
+//                        selected = selectedIndex == 3,
+//                        onClick = {
+//                            selectedIndex = 3
+//                            backStack.removeLast()
+//                            backStack.add(Route.Main.Setting)
+//                        }
+//                    )
                 }
             }
         }
@@ -125,15 +133,40 @@ fun MiwuIcon(
     res: DrawableResource, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier.size(44.dp).clip(RoundedCornerShape(10.dp))
+        modifier = modifier
+            .size(44.dp)
+            .clip(RoundedCornerShape(10.dp))
             .background(if (selected) MiwuTheme.colors.primary.copy(alpha = 0.12f) else Color.Transparent)
-            .clickable(onClick = onClick), contentAlignment = Alignment.Center
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
     ) {
         Image(
             painter = painterResource(res),
             contentDescription = null,
             modifier = Modifier.size(24.dp),
             colorFilter = ColorFilter.tint(if (selected) MiwuTheme.colors.primary else MiwuTheme.colors.secondary)
+        )
+    }
+}
+
+@Composable
+fun MiwuImage(
+    url: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .size(44.dp)
+            .clip(CircleShape)
+            .background(if (selected) MiwuTheme.colors.primary.copy(alpha = 0.12f) else Color.Transparent)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        AsyncImage(
+            model = url,
+            contentDescription = null,
+            modifier = Modifier
+                .size(30.dp)
+                .clip(CircleShape)
         )
     }
 }

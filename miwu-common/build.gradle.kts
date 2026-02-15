@@ -15,13 +15,14 @@ kotlin {
     jvm()
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.components.resources)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
+            implementation(libs.jetbrains.compose.runtime)
+            implementation(libs.jetbrains.compose.foundation)
+            implementation(libs.jetbrains.compose.animation)
+            implementation(libs.jetbrains.compose.ui)
+            implementation(libs.jetbrains.compose.components.resources)
         }
         jvmMain.dependencies {
+            implementation(compose.desktop.currentOs)
             implementation(libs.miwu.miot.api)
             implementation(libs.miwu.support)
             implementation(libs.miwu.support.annotation)

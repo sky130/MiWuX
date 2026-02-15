@@ -1,4 +1,4 @@
-package miwu.ui
+package miwu.compose.basic
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
@@ -30,6 +30,7 @@ data class MiwuColorScheme(
     val onBackground: Color = Color(0xFF222222),
     val onSurface: Color = Color(0xFF222222),
     val onSurfaceVariant: Color = Color(0xFF777777),
+    val border : Color = Color(0xFFE5E5E5),
 )
 
 data class MiwuColor(
@@ -48,9 +49,11 @@ data class MiwuColor(
     ),
 )
 
+val DefaultColorScheme = MiwuColorScheme()
+
 
 val LocalColor = compositionLocalOf<MiwuColorScheme> {
-    error("Color not set")
+    DefaultColorScheme
 }
 
 val LocalFontFamily = compositionLocalOf<FontFamily> {
