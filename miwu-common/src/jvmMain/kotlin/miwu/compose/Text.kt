@@ -57,3 +57,20 @@ fun Title(
         content()
     }
 }
+
+@Composable
+fun Label(
+    color: Color = Color.Unspecified,
+    fontWeight: FontWeight = FontWeight.Normal,
+    fontSize: TextUnit = 14.sp,
+    content: @Composable () -> Unit
+) {
+    val textColor = if (color == Color.Unspecified) MiwuTheme.colors.onSurface else color
+    CompositionLocalProvider(
+        LocalTextColor provides textColor,
+        LocalTextFontWeight provides fontWeight,
+        LocalTextFontSize provides fontSize,
+    ) {
+        content()
+    }
+}

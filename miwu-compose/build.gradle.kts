@@ -31,13 +31,19 @@ kotlin {
     }
 }
 
+
 ksp {
-    arg("miwu.spec.enabled", "true")
+
 }
 
+//ksp {
+//    arg("miwu.spec.enabled", "false")
+//    arg("miwu.icon.enabled", "false")
+//}
+
 dependencies {
-    ksp(project(":miwu-compose-processor"))
-    ksp(libs.miwu.support.processor)
+    add("kspJvm", libs.miwu.support.processor)
+    add("kspJvm", project(":miwu-compose-processor"))
 }
 
 afterEvaluate {
