@@ -11,7 +11,9 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.github.miwu.logic.datastore.MiotUserDataStore
+import com.github.miwu.logic.datastore.serializer.MiotUserSerializer
 import com.github.miwu.logic.repository.AppRepository
+import com.github.miwu.logic.repository.MiotRepository
 import com.github.miwu.logic.state.LoginState
 import com.github.miwu.route.Route
 import com.github.miwu.route.replaceCurrent
@@ -20,6 +22,7 @@ import miwu.compose.SnackHost
 import miwu.compose.SnackState
 import miwu.compose.rememberSnackState
 import miwu.compose.basic.MiwuTheme
+import miwu.miot.model.MiotUser
 import org.koin.compose.koinInject
 
 val LocalRootNavBackStack = compositionLocalOf<SnapshotStateList<Route>> {
@@ -30,10 +33,14 @@ val LocalGlobalSnackState = compositionLocalOf<SnackState> {
     error("No SnackState provided")
 }
 
+val LocalMiotUser = compositionLocalOf<MiotUser> {
+    error("No MiotUser provided")
+}
+
 @Composable
 fun App(
     miotUserDataStore: MiotUserDataStore = koinInject(),
-    appRepository: AppRepository = koinInject(),
+    miotRepository: MiotRepository = koinInject()
 ) {
     LaunchedEffect(Unit) {
         ComposeTranslateHelper.init()
@@ -42,7 +49,7 @@ fun App(
         val snackState = rememberSnackState()
         val backStack: SnapshotStateList<Route> = remember { mutableStateListOf(Route.Blank) }
         LaunchedEffect(Unit) {
-            appRepository.loginStatus.collect { loginState ->
+            miotRepository.loginStatus.collect { loginState ->
                 when (loginState) {
                     LoginState.Loading -> Route.Blank
                     LoginState.Success -> Route.Main
@@ -53,9 +60,11 @@ fun App(
                 }
             }
         }
+        val miotUser by miotUserDataStore.data.collectAsState(MiotUserSerializer.defaultValue)
         CompositionLocalProvider(
             LocalRootNavBackStack provides backStack,
-            LocalGlobalSnackState provides snackState
+            LocalGlobalSnackState provides snackState,
+            LocalMiotUser provides miotUser
         ) {
             Box(Modifier.fillMaxSize().background(MiwuTheme.colors.background)) {
                 NavDisplay(

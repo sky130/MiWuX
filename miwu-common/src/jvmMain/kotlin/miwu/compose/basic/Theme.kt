@@ -68,7 +68,7 @@ object MiwuTheme {
 @Composable
 fun MiwuTheme(
     color: MiwuColor = MiwuColor(),
-    fontFamily: FontFamily = miSansFontFamily,
+    fontFamily: FontFamily = harmonyOSFontFamily,
     isDarkMode: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {

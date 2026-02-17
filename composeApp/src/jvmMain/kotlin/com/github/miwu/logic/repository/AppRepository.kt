@@ -26,6 +26,8 @@ interface AppRepository {
 
     val userInfo: StateFlow<MiotUserInfo.UserInfo>
 
+    val currentRoomList : StateFlow<Map<String, MiotDevice>>
+
     fun refreshAll()
 
     fun refreshHomes(): Job

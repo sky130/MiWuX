@@ -1,6 +1,8 @@
 package com.github.miwu.screen.device
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -8,9 +10,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.Surface
+import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,7 +61,11 @@ fun DeviceControlScreen(
     LaunchedEffect(device) {
         viewModel.manager.init()
     }
-    Column(modifier = Modifier.fillMaxSize().background(MiwuTheme.colors.background)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MiwuTheme.colors.background)
+    ) {
         TitleBar(device) {
             runCatching {
                 viewModel.manager.stop()
@@ -98,27 +106,37 @@ private fun createWrapper(miotWidget: MiwuWidget<*>): ComposeMiwuWrapper<*>? {
 @Composable
 fun TitleBar(device: MiotDevice, onBack: () -> Unit = {}) {
     val navController = LocalRootNavBackStack.current
-    Row(modifier = Modifier.fillMaxWidth().padding(5.dp)) {
-        Surface(
-            onClick = {
-                onBack()
-                navController.removeLast()
-            }, modifier = Modifier.clip(CircleShape).wrapContentSize(), color = Color.Transparent
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            Modifier
+                .clip(CircleShape)
+                .clickable(
+                    indication = ripple(),
+                    interactionSource = remember { MutableInteractionSource() })
+                {
+                    onBack()
+                    navController.removeLast()
+                }
         ) {
-            Box(modifier = Modifier.padding(16.dp)) {
+            Box(Modifier.padding(10.dp)) {
                 Icon(
                     painterResource(Res.drawable.ic_return),
                     contentDescription = null,
                     tint = MiwuTheme.colors.onSurface,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(15.dp)
                 )
             }
         }
-
+        Spacer(Modifier.width(3.dp))
         Title {
             Text(
                 text = device.name,
-                modifier = Modifier.wrapContentHeight().weight(1f).align(Alignment.CenterVertically),
+                modifier = Modifier.weight(1f)
             )
         }
     }

@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorProducer
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
@@ -19,7 +20,6 @@ import androidx.compose.material.Text as MaterialText
 import miwu.compose.basic.MiwuColor
 import miwu.compose.basic.MiwuTheme
 
-internal val LocalTextStyle = compositionLocalOf { TextStyle.Default }
 internal val LocalTextColor = compositionLocalOf { DefaultColorScheme.onSurface }
 internal val LocalTextFontWeight = compositionLocalOf { FontWeight.Normal }
 internal val LocalTextFontSize = compositionLocalOf { TextStyle.Default.fontSize }
@@ -28,15 +28,22 @@ internal val LocalTextFontSize = compositionLocalOf { TextStyle.Default.fontSize
 fun Text(
     text: String,
     modifier: Modifier = Modifier,
+    color: Color? = null,
+    fontWeight: FontWeight? = null,
+    fontSize: TextUnit? = null,
+    fontFamily: FontFamily? = null,
+    maxLines: Int = Int.MAX_VALUE,
 ) {
-    MaterialText(
-        text = text,
-        color = LocalTextColor.current,
+    BasicText(
+        text,
         modifier = modifier,
-        fontFamily = MiwuTheme.fontFamily,
-        fontWeight = LocalTextFontWeight.current,
-        fontSize = LocalTextFontSize.current,
-        style = LocalTextStyle.current
+        style = TextStyle(
+            color = color ?: LocalTextColor.current,
+            fontFamily = fontFamily ?: MiwuTheme.fontFamily,
+            fontSize = fontSize ?: LocalTextFontSize.current,
+            fontWeight = fontWeight ?: LocalTextFontWeight.current,
+        ),
+        maxLines = maxLines
     )
 }
 
@@ -44,7 +51,7 @@ fun Text(
 @Composable
 fun Title(
     color: Color = Color.Unspecified,
-    fontWeight: FontWeight = FontWeight(600),
+    fontWeight: FontWeight = FontWeight.SemiBold,
     fontSize: TextUnit = 18.sp,
     content: @Composable () -> Unit
 ) {
@@ -67,7 +74,7 @@ fun Label(
 ) {
     val textColor = if (color == Color.Unspecified) MiwuTheme.colors.onSurface else color
     CompositionLocalProvider(
-        LocalTextColor provides textColor,
+        LocalTextColor provides textColor.copy(0.7f),
         LocalTextFontWeight provides fontWeight,
         LocalTextFontSize provides fontSize,
     ) {

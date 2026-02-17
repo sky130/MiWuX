@@ -5,16 +5,17 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple
 import androidx.compose.runtime.*
@@ -26,7 +27,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalWindowInfo
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
@@ -101,9 +101,10 @@ fun DropdownMenu(state: DropdownMenuState, modifier: Modifier = Modifier, contex
                     enter = fadeIn() + scaleIn(transformOrigin = origin),
                     exit = fadeOut() + scaleOut(transformOrigin = origin)
                 ) {
-                    val shape = remember { RoundedCornerShape(4.dp) }
+                    val shape = remember { RoundedCornerShape(15.dp) }
                     Column(
                         Modifier
+                            .width(IntrinsicSize.Max)
                             .clip(shape)
                             .background(MiwuTheme.colors.background, shape)
                     ) {
@@ -112,17 +113,19 @@ fun DropdownMenu(state: DropdownMenuState, modifier: Modifier = Modifier, contex
                 }
             }
         }
-
 }
 
 @Composable
 fun DropdownMenuItem(selected: Boolean, text: String, label: String, onClick: () -> Unit) {
     val colorScheme = MiwuTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
+    val background = if (selected) colorScheme.primary.copy(0.1f) else Color.Transparent
     val textColor = if (selected) colorScheme.primary else colorScheme.onSurface
-    val ripple = remember { ripple(color = colorScheme.primary.copy(alpha = 0.12f)) }
+    val ripple = remember { ripple() }
     Box(
         modifier = Modifier
+            .fillMaxWidth()
+            .background(background)
             .clickable(
                 interactionSource,
                 indication = ripple
@@ -130,7 +133,7 @@ fun DropdownMenuItem(selected: Boolean, text: String, label: String, onClick: ()
                 onClick()
             }
     ) {
-        Column(Modifier.padding(vertical = 5.dp, horizontal = 10.dp)) {
+        Column(Modifier.padding(vertical = 13.dp, horizontal = 15.dp).sizeIn(minWidth = 200.dp)) {
             Title(color = textColor) {
                 Text(text)
             }
