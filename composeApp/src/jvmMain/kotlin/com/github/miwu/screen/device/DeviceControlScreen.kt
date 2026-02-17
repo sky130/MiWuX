@@ -9,21 +9,21 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
-import androidx.compose.material.Surface
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.github.miwu.LocalRootNavBackStack
-import com.github.miwu.screen.device.DeviceViewModel.Event.DeviceInitiated
+import com.github.miwu.screen.device.viewModel.DeviceViewModel.Event.DeviceInitiated
+import com.github.miwu.screen.device.support.ComposeMiwuWrapperList
+import com.github.miwu.screen.device.support.DeviceLayout
+import com.github.miwu.screen.device.viewModel.DeviceViewModel
+import miwu.annotation.ValueList
 import miwu.common.resources.Res
 import miwu.common.resources.ic_return
 import miwu.compose.Text
@@ -52,7 +52,6 @@ fun DeviceControlScreen(
         viewModel.event.collect { event ->
             when (event) {
                 is DeviceInitiated -> {
-                    // layout.clearAll()
                     initDeviceLayout(viewModel.manager, layout)
                 }
             }
@@ -75,6 +74,9 @@ fun DeviceControlScreen(
             LazyColumn(Modifier.padding(horizontal = 10.dp)) {
                 List(headerList)
                 List(subHeaderList)
+                group.forEach { (name, list) ->
+                    GroupList(list)
+                }
                 List(bodyList)
                 List(subFooterList)
                 List(footerList)
@@ -83,14 +85,7 @@ fun DeviceControlScreen(
     }
 }
 
-@Suppress("FunctionName")
-fun LazyListScope.List(list: List<ComposeMiwuWrapper<*>>) {
-    item {
-        Column {
-            list.forEach { it.Content() }
-        }
-    }
-}
+fun MiwuWidget<*>.isValueList() = this::class.java.annotations.any { it is ValueList }
 
 @Suppress("UNCHECKED_CAST")
 private fun createWrapper(miotWidget: MiwuWidget<*>): ComposeMiwuWrapper<*>? {
@@ -146,7 +141,15 @@ fun TitleBar(device: MiotDevice, onBack: () -> Unit = {}) {
 suspend fun initDeviceLayout(manager: MiotDeviceManager, layout: DeviceLayout) = with(layout) {
     fun ComposeMiwuWrapperList.addWidget(widget: MiwuWidget<*>) =
         createWrapper(widget)
-            ?.also(this::add)
+            ?.also {
+                if (widget.isValueList()) {
+                    group.getOrPut(widget::class.java.name) {
+                        mutableStateListOf()
+                    }.add(it)
+                } else {
+                    add(it)
+                }
+            }
             ?.also(wrapperList::add)
     with(manager.layout) {
         Header(headerList::addWidget)

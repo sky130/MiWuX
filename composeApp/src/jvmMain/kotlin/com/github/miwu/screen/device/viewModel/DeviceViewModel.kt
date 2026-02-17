@@ -1,8 +1,10 @@
-package com.github.miwu.screen.device
+package com.github.miwu.screen.device.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.miwu.ktx.MiotDeviceClient
+import com.github.miwu.screen.device.support.ComposeCache
+import com.github.miwu.screen.device.support.ComposeTranslateHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -20,7 +22,7 @@ class DeviceViewModel(user: MiotUser, device: MiotDevice) : ViewModel(), MiotDev
     private val miotDeviceClient = MiotDeviceClient(user)
     private val _event = MutableSharedFlow<Event>()
     val event = _event.asSharedFlow()
-    val manager =  MiotDeviceManager.build(
+    val manager =  MiotDeviceManager.Companion.build(
         miotDeviceClient,
         specAttrProvider,
         device,

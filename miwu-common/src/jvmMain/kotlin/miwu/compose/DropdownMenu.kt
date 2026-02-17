@@ -48,6 +48,14 @@ inline fun Modifier.normalClickable(crossinline onClick: () -> Unit): Modifier =
     }
 }
 
+inline fun Modifier.ripple(crossinline onClick: () -> Unit): Modifier = composed {
+    clickable(
+        indication = remember { ripple() },
+        interactionSource = remember { MutableInteractionSource() }) {
+        onClick()
+    }
+}
+
 @Composable
 fun rememberDropdownMenuState() = remember { DropdownMenuState() }
 
@@ -151,7 +159,7 @@ fun DropdownMenuItem(selected: Boolean, text: String, label: String = "", onClic
                 Text(text)
             }
             if (label.isNotEmpty()) {
-                Label(color = textColor) {
+                Label(color = textColor, fontWeight = FontWeight.Normal) {
                     Text(label)
                 }
             }

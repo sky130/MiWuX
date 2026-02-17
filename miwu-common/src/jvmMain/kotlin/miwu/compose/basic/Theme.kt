@@ -31,6 +31,8 @@ data class MiwuColorScheme(
     val onSurface: Color = Color(0xFF222222),
     val onSurfaceVariant: Color = Color(0xFF777777),
     val border : Color = Color(0xFFE5E5E5),
+    val enabled: Color = Color(0xFF0E84FF),
+    val disabled: Color = Color(0xFFB0B6C2),
 )
 
 data class MiwuColor(
@@ -50,7 +52,6 @@ data class MiwuColor(
 )
 
 val DefaultColorScheme = MiwuColorScheme()
-
 
 val LocalColor = compositionLocalOf<MiwuColorScheme> {
     DefaultColorScheme
