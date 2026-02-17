@@ -2,7 +2,7 @@ package com.github.miwu.koin
 
 import com.github.miwu.logic.datastore.dataStoreModule
 import com.github.miwu.logic.setting.AppSetting
-import com.github.miwu.screen.device.DeviceViewModel
+import com.github.miwu.screen.device.viewModel.DeviceViewModel
 import com.github.miwu.screen.login.LoginViewModel
 import com.github.miwu.screen.main.viewModel.MainViewModel
 import kotlinx.coroutines.CompletableJob

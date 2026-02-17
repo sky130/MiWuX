@@ -1,4 +1,4 @@
-package miwu.compose.wrapper
+package miwu.compose.wrapper.common
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,10 +20,10 @@ import miwu.annotation.Wrapper
 import miwu.compose.wrapper.base.ComposeMiwuWrapper
 import miwu.support.base.MiwuWidget
 import miwu.compose.basic.MiwuTheme
-import miwu.widget.StatusText
+import miwu.widget.Text
 
-@Wrapper(StatusText::class)
-class ValueTextWrapper(widget: MiwuWidget<Int>) : ComposeMiwuWrapper<Int>(widget) {
+@Wrapper(Text::class)
+class TextWrapper(widget: MiwuWidget<String>) : ComposeMiwuWrapper<String>(widget) {
     var text by mutableStateOf("")
     var unit by mutableStateOf("")
     var desc by mutableStateOf("")
@@ -63,8 +63,8 @@ class ValueTextWrapper(widget: MiwuWidget<Int>) : ComposeMiwuWrapper<Int>(widget
         }
     }
 
-    override fun onUpdateValue(value: Int) {
-        text =  valueList.firstOrNull { it.value == value }?.descriptionTranslation ?: "--"
+    override fun onUpdateValue(value: String) {
+        text = value
     }
 
     override fun initWrapper() {

@@ -1,7 +1,6 @@
-package com.github.miwu.screen.device
+package com.github.miwu.screen.device.support
 
 import kndroidx.setting.getAppDataDir
-import kotlinx.serialization.encodeToString
 import miwu.miot.kmp.utils.json
 import miwu.miot.kmp.utils.to
 import miwu.miot.model.att.SpecAtt

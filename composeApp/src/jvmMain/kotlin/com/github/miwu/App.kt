@@ -17,12 +17,11 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.github.miwu.logic.datastore.MiotUserDataStore
 import com.github.miwu.logic.datastore.serializer.MiotUserSerializer
-import com.github.miwu.logic.repository.AppRepository
 import com.github.miwu.logic.repository.MiotRepository
 import com.github.miwu.logic.state.LoginState
 import com.github.miwu.route.Route
 import com.github.miwu.route.replaceCurrent
-import com.github.miwu.screen.device.ComposeTranslateHelper
+import com.github.miwu.screen.device.support.ComposeTranslateHelper
 import miwu.compose.SnackHost
 import miwu.compose.SnackState
 import miwu.compose.rememberSnackState
@@ -89,6 +88,7 @@ fun App(
                     },
                     modifier = Modifier.fillMaxSize()
                 ) { key ->
+                    println(key)
                     NavEntry(key) { key.Content() }
                 }
                 SnackHost(snackState, Modifier.fillMaxSize())

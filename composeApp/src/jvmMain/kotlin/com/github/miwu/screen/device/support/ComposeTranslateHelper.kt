@@ -1,4 +1,4 @@
-package com.github.miwu.screen.device
+package com.github.miwu.screen.device.support
 
 import miwu.common.resources.*
 import miwu.common.resources.Res
