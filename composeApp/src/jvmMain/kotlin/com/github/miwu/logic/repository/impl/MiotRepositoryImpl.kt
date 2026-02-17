@@ -133,7 +133,6 @@ class MiotRepositoryImpl() : MiotRepository, KoinComponent {
     private suspend fun convertToData(home: MiotHome) = miotHomeClient
         ?.let { client ->
             val devices = getDevices(client, home).sortedBy(MiotDevice::name)
-            println("devices: $devices")
             val deviceMap = devices.associateBy(MiotDevice::did)
             MiotHomeData(
                 home = home,
