@@ -4,12 +4,14 @@ import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.ExperimentalSettingsImplementation
 import com.russhwolf.settings.datastore.DataStoreSettings
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 
 @OptIn(ExperimentalSettingsApi::class, ExperimentalSettingsImplementation::class)
 class SettingItem<T>(
     private val setting: DataStoreSettings,
     private val name: String,
-    private val defaultValue: T,
+    val defaultValue: T,
 ) : Item<T> {
 
     override val flow: Flow<T> = getTypeFlow()
@@ -23,7 +25,7 @@ class SettingItem<T>(
                 is Float -> getFloatFlow(name, defaultValue)
                 is Boolean -> getBooleanFlow(name, defaultValue)
                 is Long -> getLongFlow(name, defaultValue)
-                else -> throw IllegalArgumentException("Unsupported type")
+                else -> error("Unsupported type")
             } as Flow<T>
         }
     }

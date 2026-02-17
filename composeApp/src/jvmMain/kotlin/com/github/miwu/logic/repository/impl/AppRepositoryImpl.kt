@@ -5,7 +5,7 @@ import com.github.miwu.ktx.MiotUserClient
 import com.github.miwu.logic.datastore.MiotUserDataStore
 import com.github.miwu.logic.datastore.isLogin
 import com.github.miwu.logic.repository.AppRepository
-import com.github.miwu.logic.repository.DeviceRepository
+import com.github.miwu.logic.repository.CacheRepository
 import com.github.miwu.logic.setting.AppSetting
 import com.github.miwu.logic.state.LoginState
 import fr.haan.resultat.Resultat
@@ -13,8 +13,12 @@ import fr.haan.resultat.toResultat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -32,12 +36,13 @@ import miwu.miot.model.miot.MiotUserInfo.UserInfo
 import miwu.miot.provider.MiotLoginProvider
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.collections.emptyList
 
 @OptIn(ExperimentalSerializationApi::class)
 class AppRepositoryImpl : KoinComponent, AppRepository {
     private val appSetting: AppSetting by inject()
     private val scope: CoroutineScope by inject()
-    private val deviceRepository: DeviceRepository by inject()
+    private val deviceRepository: CacheRepository by inject()
     private val dataStore: MiotUserDataStore by inject()
     private val loginProvider: MiotLoginProvider by inject()
     private var miotUserClient: MiotUserClient? = null
@@ -64,6 +69,7 @@ class AppRepositoryImpl : KoinComponent, AppRepository {
     override val scenes = MutableResultListStateFlow<MiotScene>(Resultat.Loading())
     override val loginStatus = MutableStateFlow<LoginState>(LoginState.Loading)
     override val userInfo = MutableStateFlow(UserInfo(0L, "", "null"))
+    override val currentRoomList: StateFlow<Map<String, MiotDevice>> = TODO()
 
     init {
         dataStore.data.onEach { user ->
@@ -92,6 +98,7 @@ class AppRepositoryImpl : KoinComponent, AppRepository {
                 refreshAll()
             }
         }.launchIn(scope)
+
     }
 
     override fun refreshAll() {
@@ -123,9 +130,6 @@ class AppRepositoryImpl : KoinComponent, AppRepository {
                 homes.shareHomes?.let { addAll(it) }
             }
         }.onSuccess { list ->
-            list.flatMap(MiotHome::rooms)
-                .flatMap { room -> room.dids.map { it to room.name } }
-                .let { deviceRepository.addRoom(it) }
             list.takeIf { currentHomeId == 0L }
                 ?.firstOrNull()
                 ?.let { setActiveHome(it) }

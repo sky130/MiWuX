@@ -43,50 +43,50 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun DeviceScreen(viewModel: MainViewModel = koinViewModel()) {
     val backStack = LocalRootNavBackStack.current
-    val deviceList by viewModel.deviceList.collectAsState()
+//    val deviceList by viewModel.deviceList.collectAsState()
     val miotUser by viewModel.miotUser.collectAsState()
-    when (deviceList) {
-        is Resultat.Failure -> {
-            /** TODO **/
-            return
-        }
-
-        is Resultat.Loading -> {
-            /** TODO **/
-            return
-        }
-
-        else -> Unit
-    }
+//    when (deviceList) {
+//        is Resultat.Failure -> {
+//            /** TODO **/
+//            return
+//        }
+//
+//        is Resultat.Loading -> {
+//            /** TODO **/
+//            return
+//        }
+//
+//        else -> Unit
+//    }
     LazyVerticalGrid(
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalArrangement = Arrangement.spacedBy(5.dp),
         modifier = Modifier.padding(start = 10.dp, end = 10.dp),
         columns = GridCells.Adaptive(minSize = 150.dp)
     ) {
-        items(deviceList.getOrNull().orEmpty()) { (device, _, icon) ->
-            Surface(
-                onClick = {
-                    backStack.add(Route.Device(miotUser, device))
-                },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(10.dp))
-                    .border(1.dp, MiwuTheme.colors.border, RoundedCornerShape(10.dp)),
-                color = MiwuTheme.colors.surface
-            ) {
-                Column(modifier = Modifier.padding(15.dp)) {
-                    AsyncImage(model = icon, contentDescription = null, modifier = Modifier.size(35.dp))
-                    Title {
-                        Text(device.name)
-                    }
-                    Label {
-                        Text("设备在线")
-                    }
-//                    CardTitle(device.name)
-//                    CardSubtitle("设备在线")
-                }
-            }
-        }
+//        items(deviceList.getOrNull().orEmpty()) { (device, _, icon) ->
+//            Surface(
+//                onClick = {
+//                    backStack.add(Route.Device(miotUser, device))
+//                },
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .clip(RoundedCornerShape(10.dp))
+//                    .border(1.dp, MiwuTheme.colors.border, RoundedCornerShape(10.dp)),
+//                color = MiwuTheme.colors.surface
+//            ) {
+//                Column(modifier = Modifier.padding(15.dp)) {
+//                    AsyncImage(model = icon, contentDescription = null, modifier = Modifier.size(35.dp))
+//                    Title {
+//                        Text(device.name)
+//                    }
+//                    Label {
+//                        Text("设备在线")
+//                    }
+////                    CardTitle(device.name)
+////                    CardSubtitle("设备在线")
+//                }
+//            }
+//        }
     }
 }

@@ -14,7 +14,7 @@ class SettingEnumItem<T>(
     private val encode: (T) -> String,
     private val decode: (String) -> T,
 ) : Item<T> {
-    private val defaultValue = encode(defaultValue)
+    val defaultValue = encode(defaultValue)
     override val flow: Flow<T> = setting
         .getStringFlow(name, this.defaultValue)
         .map {

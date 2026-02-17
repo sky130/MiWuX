@@ -29,9 +29,9 @@ import org.koin.compose.viewmodel.koinViewModel
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SettingScreen(viewModel: MainViewModel = koinViewModel()) {
-    val userInfo by viewModel.userInfo.collectAsState()
+//    val userInfo by viewModel.userInfo.collectAsState()
     Column {
-        ProfileColumn(userInfo)
+//        ProfileColumn(userInfo)
     }
 //    val homeList by viewModel.homeList.collectAsState()
 //    when (homeList) {
