@@ -3,22 +3,18 @@
 package com.github.miwu.screen.main
 
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.togetherWith
-import androidx.compose.animation.veilOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -28,8 +24,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.DrawerDefaults.backgroundColor
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.Surface
@@ -37,30 +31,24 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.savedstate.savedState
 import coil3.compose.AsyncImage
+import com.github.miwu.LocalGlobalSnackState
 import com.github.miwu.LocalMiotUser
 import com.github.miwu.LocalRootNavBackStack
 import com.github.miwu.logic.repository.entity.MiotHomeData
 import com.github.miwu.route.Route
 import com.github.miwu.screen.main.viewModel.MainViewModel
-import fr.haan.resultat.Resultat
 import fr.haan.resultat.Resultat.*
-import fr.haan.resultat.fold
 import miwu.common.resources.Res
 import miwu.common.resources.ic_dropdown
+import miwu.common.resources.ic_menu
 import miwu.compose.DropdownMenu
 import miwu.compose.DropdownMenuItem
 import miwu.compose.Label
@@ -71,19 +59,21 @@ import miwu.compose.basic.MiwuTheme
 import miwu.compose.fadeEdge
 import miwu.compose.normalClickable
 import miwu.compose.rememberDropdownMenuState
-import miwu.miot.client.MiotHomeClient
 import miwu.miot.model.miot.MiotDevice
-import miwu.widget.Text
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MainScreen(viewModel: MainViewModel = koinViewModel()) {
     val currentHome by viewModel.currentHome.collectAsState()
+    var currentHomeData by rememberSaveable { mutableStateOf<MiotHomeData?>(null) }
     var currentRoom by rememberSaveable { mutableStateOf("") }
     val iconMap by viewModel.iconMap.collectAsState()
     LaunchedEffect(currentHome) {
-        currentRoom = currentHome.getOrNull()?.rooms?.keys?.firstOrNull() ?: ""
+        if (currentHomeData != currentHome.getOrNull()) {
+            currentHomeData = currentHome.getOrNull()
+            currentRoom = currentHome.getOrNull()?.rooms?.keys?.firstOrNull() ?: ""
+        }
     }
     Column(
         Modifier
@@ -111,6 +101,9 @@ fun MainScreen(viewModel: MainViewModel = koinViewModel()) {
                     RoomRow(currentRoom, rooms) {
                         currentRoom = it
                     }
+                    LaunchedEffect(pageState.targetPage) {
+                        currentRoom = rooms[pageState.targetPage]
+                    }
                     HorizontalPager(
                         pageState,
                         modifier = Modifier
@@ -131,6 +124,7 @@ fun DeviceGrid(
     icons: Map<String, String>,
     modifier: Modifier
 ) {
+    val snackState = LocalGlobalSnackState.current
     val backStack = LocalRootNavBackStack.current
     val miotUser = LocalMiotUser.current
     LazyVerticalGrid(
@@ -143,21 +137,33 @@ fun DeviceGrid(
             val shape = RoundedCornerShape(10.dp)
             Surface(
                 onClick = {
-                     backStack.add(Route.Device(miotUser, device))
+                    if (device.isOnline)
+                        backStack.add(Route.Device(miotUser, device))
+                    else
+                        snackState.showMessage("设备离线")
                 },
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(shape)
+                    .alpha(if (device.isOnline) 1f else 0.6f)
                     .border(1.dp, MiwuTheme.colors.border, shape),
                 color = MiwuTheme.colors.surface
             ) {
                 Column(modifier = Modifier.padding(15.dp)) {
-                    AsyncImage(model = icons[device.model], contentDescription = null, modifier = Modifier.size(35.dp))
+                    AsyncImage(
+                        model = icons[device.model],
+                        contentDescription = device.name,
+                        modifier = Modifier.size(45.dp)
+                    )
+                    Spacer(Modifier.height(5.dp))
                     Title {
-                        Text(device.name)
+                        Text(device.name, fontSize = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                     Label {
-                        Text("设备在线")
+                        if (device.isOnline)
+                            Text("设备在线")
+                        else
+                            Text("设备离线", color = MiwuTheme.colors.onSurface.copy(0.5f))
                     }
                 }
             }
@@ -166,29 +172,71 @@ fun DeviceGrid(
 }
 
 @Composable
-fun RoomRow(currentRoom: String, rooms: List<String>, onClick: (String) -> Unit) {
+fun RoomRow(currentRoom: String, rooms: List<String>, onRoomClick: (String) -> Unit) {
     val lazyListState = rememberLazyListState()
-    LazyRow(
-        state = lazyListState,
-        horizontalArrangement = Arrangement.spacedBy(17.dp),
+    val dropdownMenuState = rememberDropdownMenuState()
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .padding(horizontal = 15.dp)
-            .fadeEdge(
-                20.dp,
-                start = lazyListState.canScrollBackward,
-                end = lazyListState.canScrollForward
-            )
     ) {
-        items(rooms) {
-            val color = if (it == currentRoom) LocalColor.current.onSurface
-            else LocalColor.current.onSurface.copy(alpha = 0.4f)
-            Text(
-                it,
-                color = color,
-                fontWeight = FontWeight.Medium,
-                fontSize = 18.sp,
-                modifier = Modifier.normalClickable { onClick(it) }
-            )
+        LazyRow(
+            state = lazyListState,
+            horizontalArrangement = Arrangement.spacedBy(15.dp),
+            modifier = Modifier
+                .weight(1f)
+                .fadeEdge(
+                    20.dp,
+                    start = lazyListState.canScrollBackward,
+                    end = lazyListState.canScrollForward
+                ),
+        ) {
+            items(rooms) {
+                val color = if (it == currentRoom) LocalColor.current.onSurface
+                else LocalColor.current.onSurface.copy(alpha = 0.4f)
+                val weight = if (it == currentRoom) FontWeight.Medium else FontWeight.Normal
+                Text(
+                    it,
+                    color = color,
+                    fontWeight = weight,
+                    fontSize = 18.sp,
+                    modifier = Modifier.normalClickable { onRoomClick(it) }
+                )
+            }
+        }
+        Spacer(Modifier.width(5.dp))
+        Box(
+            Modifier
+                .clip(RoundedCornerShape(100.dp))
+                .background(MiwuTheme.colors.onBackground.copy(0.05f))
+                .normalClickable {
+                    dropdownMenuState.expand()
+                }
+        ) {
+            Box(Modifier.padding(vertical = 5.dp, horizontal = 10.dp)) {
+                Icon(
+                    painterResource(Res.drawable.ic_menu),
+                    null,
+                    tint = MiwuTheme.colors.onBackground.copy(0.8f),
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+    }
+    DropdownMenu(
+        dropdownMenuState,
+        Modifier.padding(top = 70.dp, end = 10.dp),
+        origin = TransformOrigin(1f, 0f),
+        contentAlignment = Alignment.TopEnd
+    ) {
+        for (room in rooms) {
+            DropdownMenuItem(
+                room == currentRoom,
+                room,
+            ) {
+                onRoomClick(room)
+                dropdownMenuState.collapse()
+            }
         }
     }
 }
@@ -236,5 +284,4 @@ fun HomeTitle(name: String, onClick: () -> Unit) {
             tint = MiwuTheme.colors.onBackground.copy(0.6f)
         )
     }
-
 }

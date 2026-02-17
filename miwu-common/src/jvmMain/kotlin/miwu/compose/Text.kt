@@ -33,6 +33,7 @@ fun Text(
     fontSize: TextUnit? = null,
     fontFamily: FontFamily? = null,
     maxLines: Int = Int.MAX_VALUE,
+    overflow: TextOverflow = TextOverflow.Clip,
 ) {
     BasicText(
         text,
@@ -43,7 +44,8 @@ fun Text(
             fontSize = fontSize ?: LocalTextFontSize.current,
             fontWeight = fontWeight ?: LocalTextFontWeight.current,
         ),
-        maxLines = maxLines
+        maxLines = maxLines,
+        overflow = overflow
     )
 }
 
@@ -51,7 +53,7 @@ fun Text(
 @Composable
 fun Title(
     color: Color = Color.Unspecified,
-    fontWeight: FontWeight = FontWeight.SemiBold,
+    fontWeight: FontWeight = FontWeight.Medium,
     fontSize: TextUnit = 18.sp,
     content: @Composable () -> Unit
 ) {

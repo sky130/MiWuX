@@ -1,10 +1,14 @@
 package miwu.compose
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -19,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -27,6 +32,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
@@ -63,7 +69,15 @@ class DropdownMenuState {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun DropdownMenu(state: DropdownMenuState, modifier: Modifier = Modifier, context: @Composable () -> Unit) {
+fun DropdownMenu(
+    state: DropdownMenuState,
+    modifier: Modifier = Modifier,
+    origin: TransformOrigin = TransformOrigin(0f, 0f),
+    enter: EnterTransition = fadeIn() + scaleIn(transformOrigin = origin),
+    exit: ExitTransition = fadeOut() + scaleOut(transformOrigin = origin),
+    contentAlignment: Alignment = Alignment.TopStart,
+    content: @Composable () -> Unit
+) {
     val provider = rememberPopupPositionProviderAtPosition(Offset(0f, 0f))
     var animated by remember { mutableStateOf(false) }
     var expanded by remember { mutableStateOf(false) }
@@ -94,12 +108,11 @@ fun DropdownMenu(state: DropdownMenuState, modifier: Modifier = Modifier, contex
                         }
                 )
             }
-            Box(modifier.fillMaxWidth()) {
-                val origin = remember { TransformOrigin(0f, 0f) }
+            Box(modifier.fillMaxWidth(), contentAlignment = contentAlignment) {
                 AnimatedVisibility(
                     animated,
-                    enter = fadeIn() + scaleIn(transformOrigin = origin),
-                    exit = fadeOut() + scaleOut(transformOrigin = origin)
+                    enter = enter,
+                    exit = exit,
                 ) {
                     val shape = remember { RoundedCornerShape(15.dp) }
                     Column(
@@ -108,7 +121,7 @@ fun DropdownMenu(state: DropdownMenuState, modifier: Modifier = Modifier, contex
                             .clip(shape)
                             .background(MiwuTheme.colors.background, shape)
                     ) {
-                        context()
+                        content()
                     }
                 }
             }
@@ -116,7 +129,7 @@ fun DropdownMenu(state: DropdownMenuState, modifier: Modifier = Modifier, contex
 }
 
 @Composable
-fun DropdownMenuItem(selected: Boolean, text: String, label: String, onClick: () -> Unit) {
+fun DropdownMenuItem(selected: Boolean, text: String, label: String = "", onClick: () -> Unit) {
     val colorScheme = MiwuTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
     val background = if (selected) colorScheme.primary.copy(0.1f) else Color.Transparent
@@ -133,12 +146,14 @@ fun DropdownMenuItem(selected: Boolean, text: String, label: String, onClick: ()
                 onClick()
             }
     ) {
-        Column(Modifier.padding(vertical = 13.dp, horizontal = 15.dp).sizeIn(minWidth = 200.dp)) {
-            Title(color = textColor) {
+        Column(Modifier.padding(vertical = 15.dp, horizontal = 15.dp).sizeIn(minWidth = 200.dp)) {
+            Title(color = textColor, fontWeight = FontWeight.Medium) {
                 Text(text)
             }
-            Label(color = textColor) {
-                Text(label)
+            if (label.isNotEmpty()) {
+                Label(color = textColor) {
+                    Text(label)
+                }
             }
         }
     }

@@ -13,6 +13,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -111,14 +112,14 @@ fun SnackHost(
                         .border(1.dp, MiwuTheme.colors.border, RoundedCornerShape(8.dp))
                         .background(MiwuTheme.colors.background)
                         .padding(horizontal = 16.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    CompositionLocalProvider(
-                        LocalTextColor provides MiwuTheme.colors.onBackground,
-                        LocalTextFontSize provides 14.sp
-                    ) {
+                    Title {
                         Text(
                             text = message.text,
-                            modifier = Modifier.background(Color.Transparent)
+                            modifier = Modifier.background(Color.Transparent),
+                            color = MiwuTheme.colors.onBackground,
+                            fontSize = 14.sp
                         )
                     }
                     Spacer(Modifier.weight(1f))
