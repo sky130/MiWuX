@@ -105,11 +105,13 @@ fun SnackHost(
                     animationSpec = tween(durationMillis = 300)
                 ) + fadeOut(animationSpec = tween(durationMillis = 300)),
             ) {
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(8.dp))
                         .border(1.dp, MiwuTheme.colors.border, RoundedCornerShape(8.dp))
+                        .background(MiwuTheme.colors.background)
                         .background(MiwuTheme.colors.surface)
                         .padding(horizontal = 16.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically

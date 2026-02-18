@@ -22,7 +22,7 @@ class DeviceViewModel(user: MiotUser, device: MiotDevice) : ViewModel(), MiotDev
     private val miotDeviceClient = MiotDeviceClient(user)
     private val _event = MutableSharedFlow<Event>()
     val event = _event.asSharedFlow()
-    val manager =  MiotDeviceManager.Companion.build(
+    val manager = MiotDeviceManager.Companion.build(
         miotDeviceClient,
         specAttrProvider,
         device,
@@ -37,6 +37,11 @@ class DeviceViewModel(user: MiotUser, device: MiotDevice) : ViewModel(), MiotDev
         viewModelScope.launch {
             _event.emit(Event.DeviceInitiated)
         }
+    }
+
+    override fun onCleared() {
+        manager.stop()
+        super.onCleared()
     }
 
     sealed interface Event {
