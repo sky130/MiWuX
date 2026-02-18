@@ -74,7 +74,7 @@ class SwitchWrapper(widget: MiwuWidget<Boolean>) : ComposeMiwuWrapper<Boolean>(w
                 .padding(10.dp),
             contentAlignment = Alignment.Center
         ) {
-            Icon(composeIcon, null, Modifier.size(20.dp), tint = Color.White)
+            Icon(ComposeIcon, null, Modifier.size(20.dp), tint = Color.White)
         }
     }
 

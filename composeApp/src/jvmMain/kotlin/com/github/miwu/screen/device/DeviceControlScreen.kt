@@ -35,6 +35,8 @@ import miwu.support.base.MiwuWidget
 import miwu.support.base.MiwuWrapper
 import miwu.support.manager.MiotDeviceManager
 import miwu.compose.basic.MiwuTheme
+import miwu.compose.wrapper.base.Zone
+import miwu.compose.wrapper.base.Zone.*
 import miwu.widget.generated.wrapper.WrapperRegistry
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -71,7 +73,10 @@ fun DeviceControlScreen(
             }
         }
         with(layout) {
-            LazyColumn(Modifier.padding(horizontal = 10.dp)) {
+            LazyColumn(
+                Modifier.padding(horizontal = 10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 List(headerList)
                 List(subHeaderList)
                 group.forEach { (name, list) ->
@@ -141,16 +146,22 @@ fun TitleBar(device: MiotDevice, onBack: () -> Unit = {}) {
 suspend fun initDeviceLayout(manager: MiotDeviceManager, layout: DeviceLayout) = with(layout) {
     fun ComposeMiwuWrapperList.addWidget(widget: MiwuWidget<*>) =
         createWrapper(widget)
-            ?.also {
+            ?.also(wrapperList::add)
+            ?.also { wrapper ->
                 if (widget.isValueList()) {
-                    group.getOrPut(widget::class.java.name) {
-                        mutableStateListOf()
-                    }.add(it)
+                    val groupName = widget.serviceName to widget.propertyName
+                    group.getOrPut(groupName) { mutableStateListOf() }.add(wrapper)
                 } else {
-                    add(it)
+                    when (wrapper.remapTo) {
+                        Header -> headerList.add(wrapper)
+                        SubHeader -> subHeaderList.add(wrapper)
+                        Body -> bodyList.add(wrapper)
+                        SubFooter -> subFooterList.add(wrapper)
+                        Footer -> footerList.add(wrapper)
+                        Unspecified -> this.add(wrapper)
+                    }
                 }
             }
-            ?.also(wrapperList::add)
     with(manager.layout) {
         Header(headerList::addWidget)
         SubHeader(subHeaderList::addWidget)

@@ -100,3 +100,20 @@ fun Label(
         content()
     }
 }
+
+@Composable
+fun WrapperLabel(
+    color: Color = Color.Unspecified,
+    fontWeight: FontWeight = FontWeight.Normal,
+    fontSize: TextUnit = 13.sp,
+    content: @Composable () -> Unit
+) {
+    val textColor = if (color == Color.Unspecified) MiwuTheme.colors.onSurface else color
+    CompositionLocalProvider(
+        LocalTextColor provides textColor.copy(0.7f),
+        LocalTextFontWeight provides fontWeight,
+        LocalTextFontSize provides fontSize,
+    ) {
+        content()
+    }
+}

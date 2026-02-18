@@ -1,6 +1,12 @@
 package miwu.compose
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -11,6 +17,7 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import miwu.compose.basic.MiwuTheme
 
 fun Modifier.fadeEdge(fadeSize: Dp = 10.dp, start: Boolean = true, end: Boolean = true) = this
     .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
@@ -37,3 +44,12 @@ fun Modifier.fadeEdge(fadeSize: Dp = 10.dp, start: Boolean = true, end: Boolean 
                 blendMode = BlendMode.DstIn
             )
     }
+
+@Composable
+fun Modifier.border(): Modifier {
+    val shape = remember { RoundedCornerShape(15.dp) }
+    return this
+        .background(MiwuTheme.colors.surface, shape)
+        .clip(shape)
+        .border(1.dp, MiwuTheme.colors.border, shape)
+}

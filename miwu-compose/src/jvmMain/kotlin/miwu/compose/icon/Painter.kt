@@ -12,7 +12,7 @@ private val emptySvgPainter: Painter by lazy { BitmapPainter(emptyImageBitmap) }
 
 
 @Composable
-fun iconPainter(icon: Icon) = when (icon) {
+fun miwuIconPainter(icon: Icon) = when (icon) {
     is ComposeIcon -> painterResource(icon.res)
     else -> emptySvgPainter
 }

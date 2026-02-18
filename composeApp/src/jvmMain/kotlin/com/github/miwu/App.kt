@@ -88,7 +88,6 @@ fun App(
                     },
                     modifier = Modifier.fillMaxSize()
                 ) { key ->
-                    println(key)
                     NavEntry(key) { key.Content() }
                 }
                 SnackHost(snackState, Modifier.fillMaxSize())

@@ -8,6 +8,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -56,6 +57,7 @@ import miwu.compose.Text
 import miwu.compose.Title
 import miwu.compose.basic.LocalColor
 import miwu.compose.basic.MiwuTheme
+import miwu.compose.border
 import miwu.compose.fadeEdge
 import miwu.compose.normalClickable
 import miwu.compose.rememberDropdownMenuState
@@ -131,10 +133,10 @@ fun DeviceGrid(
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalArrangement = Arrangement.spacedBy(5.dp),
         modifier = modifier.padding(start = 10.dp, end = 10.dp).fillMaxSize(),
-        columns = GridCells.Adaptive(minSize = 170.dp)
+        columns = GridCells.Adaptive(minSize = 170.dp),
+        contentPadding = PaddingValues(bottom = 10.dp)
     ) {
         items(devices) { device ->
-            val shape = RoundedCornerShape(10.dp)
             Surface(
                 onClick = {
                     if (device.isOnline)
@@ -144,9 +146,8 @@ fun DeviceGrid(
                 },
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(shape)
-                    .alpha(if (device.isOnline) 1f else 0.6f)
-                    .border(1.dp, MiwuTheme.colors.border, shape),
+                    .border()
+                    .alpha(if (device.isOnline) 1f else 0.6f),
                 color = MiwuTheme.colors.surface
             ) {
                 Column(modifier = Modifier.padding(15.dp)) {
