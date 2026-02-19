@@ -110,7 +110,7 @@ fun DropdownMenu(
                 Box(
                     Modifier
                         .size(LocalWindowInfo.current.containerDpSize)
-                        .background(Color.Black.copy(0.6f))
+                        .background(Color.Black.copy(0.6f), RoundedCornerShape(15.dp))
                         .normalClickable {
                             state.collapse()
                         }

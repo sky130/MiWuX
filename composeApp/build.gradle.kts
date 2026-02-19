@@ -54,6 +54,7 @@ kotlin {
         }
         jvmMain.dependencies {
             // implementation(libs.androidx.ui.desktop)
+            implementation("io.github.kdroidfilter:composenativetray:1.1.0")
             implementation(libs.androidx.datastore.core.jvm)
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
