@@ -10,20 +10,21 @@ object ComposeTranslateHelper : TranslateHelper {
 
     suspend fun init() {
         languageMap += mapOf(
-            "Auto" to getString(Res.string.Auto),
-            "Cool" to getString(Res.string.Cool),
-            "Dry" to getString(Res.string.Dry),
-            "Heat" to getString(Res.string.Heat),
-            "Fan" to getString(Res.string.Fan),
-            "Normal" to getString(Res.string.Normal),
-            "Low" to getString(Res.string.LowFood),
-            "Empty" to getString(Res.string.EmptyFood),
-            "Temperature" to getString(Res.string.Temperature),
-            "Relative Humidity" to getString(Res.string.relative_humidity),
-            "Battery" to getString(Res.string.battery),
-            "Pet Food Out" to getString(Res.string.pet_food_out),
-            "fan" to getString(Res.string.fan2),
-        )
+            "Auto" to Res.string.Auto,
+            "Cool" to Res.string.Cool,
+            "Dry" to Res.string.Dry,
+            "Heat" to Res.string.Heat,
+            "Fan" to Res.string.Fan,
+            "Normal" to Res.string.Normal,
+            "Low" to Res.string.LowFood,
+            "Empty" to Res.string.EmptyFood,
+            "Temperature" to Res.string.Temperature,
+            "Relative Humidity" to Res.string.relative_humidity,
+            "Battery" to Res.string.battery,
+            "Pet Food Out" to Res.string.pet_food_out,
+            "fan" to Res.string.fan2,
+            "Brightness" to Res.string.Brightness
+        ).mapValues { (_, res) -> getString(res) }
     }
 
     override fun translate(origin: String): String = languageMap[origin] ?: origin

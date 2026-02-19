@@ -46,6 +46,7 @@ import com.github.miwu.LocalRootNavBackStack
 import com.github.miwu.logic.repository.entity.MiotHomeData
 import com.github.miwu.route.Route
 import com.github.miwu.screen.main.viewModel.MainViewModel
+import dev.vivvvek.seeker.Seeker
 import fr.haan.resultat.Resultat.*
 import miwu.common.resources.Res
 import miwu.common.resources.ic_dropdown
@@ -139,7 +140,7 @@ fun DeviceGrid(
         items(devices) { device ->
             Surface(
                 onClick = {
-                    if (device.isOnline)
+                    if (device.isOnline || true)
                         backStack.add(Route.Device(miotUser, device))
                     else
                         snackState.showMessage("设备离线")

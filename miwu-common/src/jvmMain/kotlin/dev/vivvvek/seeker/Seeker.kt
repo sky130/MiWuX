@@ -123,7 +123,7 @@ fun Seeker(
     onValueChangeFinished: (() -> Unit)? = null,
     segments: List<Segment> = emptyList(),
     enabled: Boolean = true,
-    colors: SeekerColors = SeekerDefaults.seekerColors(),
+    colors: SeekerColors = SeekerDefaults.seekerMiwuColors(),
     dimensions: SeekerDimensions = SeekerDefaults.seekerDimensions(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {

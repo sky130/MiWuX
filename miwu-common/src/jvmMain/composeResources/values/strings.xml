@@ -20,4 +20,5 @@
     <string name="EmptyFood">已经没得吃了</string>
     <string name="Medium">中速</string>
     <string name="High">高速</string>
+    <string name="Brightness">亮度</string>
 </resources>

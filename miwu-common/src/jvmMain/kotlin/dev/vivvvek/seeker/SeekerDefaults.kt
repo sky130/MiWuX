@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import miwu.compose.basic.MiwuTheme
 
 object SeekerDefaults {
 
@@ -54,6 +55,42 @@ object SeekerDefaults {
         disabledThumbColor: Color = MaterialTheme.colors.onSurface
             .copy(alpha = ContentAlpha.disabled)
             .compositeOver(MaterialTheme.colors.surface),
+        readAheadColor: Color = ReadAheadColor
+    ): SeekerColors = DefaultSeekerColor(
+        progressColor = progressColor,
+        trackColor = trackColor,
+        disabledProgressColor = disabledProgressColor,
+        disabledTrackColor = disabledTrackColor,
+        thumbColor = thumbColor,
+        disabledThumbColor = disabledThumbColor,
+        readAheadColor = readAheadColor
+    )
+
+    /**
+     * Creates a [SeekerColors] that represents the different colors used in parts of the
+     * [Seeker] in different states.
+     *
+     * @param progressColor color of the progress indicator.
+     * @param trackColor color of the track.
+     * @param disabledProgressColor color of the progress indicator when the Slider is
+     * disabled.
+     * @param disabledTrackColor color of the track when theSlider is disabled.
+     * @param thumbColor thumb color when enabled
+     * @param disabledThumbColor thumb color when disabled.
+     * @param readAheadColor color of the read ahead indicator.
+     */
+    @Composable
+    fun seekerMiwuColors(
+        progressColor: Color = MiwuTheme.colors.enabled,
+        trackColor: Color = TrackColor,
+        disabledProgressColor: Color = MiwuTheme.colors.onSurface.copy(alpha = DisabledProgressAlpha),
+        disabledTrackColor: Color = disabledProgressColor
+            .copy(alpha = DisabledTrackAlpha)
+            .compositeOver(MiwuTheme.colors.onSurface),
+        thumbColor: Color = MiwuTheme.colors.enabled,
+        disabledThumbColor: Color = MiwuTheme.colors.onSurface
+            .copy(alpha = ContentAlpha.disabled)
+            .compositeOver(MiwuTheme.colors.surface),
         readAheadColor: Color = ReadAheadColor
     ): SeekerColors = DefaultSeekerColor(
         progressColor = progressColor,
@@ -97,7 +134,7 @@ object SeekerDefaults {
 
     internal val ThumbRadius = 10.dp
     private val TrackHeight = 4.dp
-    private val Gap = 2.dp
+    private val Gap = 0.dp
 
     internal val MinSliderHeight = 48.dp
     internal val MinSliderWidth = ThumbRadius * 2

@@ -26,6 +26,7 @@ import miwu.compose.Text
 import miwu.compose.Title
 import miwu.compose.WrapperTitle
 import miwu.compose.basic.MiwuTheme
+import miwu.compose.border
 import miwu.compose.ripple
 import miwu.compose.wrapper.base.ComposeMiwuWrapper
 import miwu.support.base.MiwuWidget
@@ -37,14 +38,11 @@ class SwitchWrapper(widget: MiwuWidget<Boolean>) : ComposeMiwuWrapper<Boolean>(w
 
     @Composable
     override fun Content() {
-        val shape = RoundedCornerShape(15.dp)
         val value = value
         Box(
             Modifier
                 .fillMaxWidth()
-                .background(MiwuTheme.colors.surface, shape)
-                .clip(shape)
-                .border(1.dp, MiwuTheme.colors.border, shape)
+                .border()
                 .ripple {
                     onClick(value)
                 }
