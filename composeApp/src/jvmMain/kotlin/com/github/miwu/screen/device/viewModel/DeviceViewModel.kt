@@ -2,49 +2,60 @@ package com.github.miwu.screen.device.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.miwu.ktx.MiotDeviceClient
+import com.github.miwu.domain.gateway.MiotClientFactory
+import com.github.miwu.domain.usecase.device.ResolveDeviceSessionUseCase
 import com.github.miwu.screen.device.support.ComposeCache
 import com.github.miwu.screen.device.support.ComposeTranslateHelper
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import miwu.compose.icon.generated.icon.ComposeIcons
-import miwu.miot.model.MiotUser
-import miwu.miot.model.miot.MiotDevice
+import miwu.dispatchers.DefaultDispatcher
+import miwu.dispatchers.UiDispatcher
 import miwu.miot.provider.MiotSpecAttrProvider
 import miwu.support.manager.MiotDeviceManager
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
 
-class DeviceViewModel(user: MiotUser, device: MiotDevice) : ViewModel(), MiotDeviceManager.Callback, KoinComponent {
-    private val specAttrProvider: MiotSpecAttrProvider by inject()
-    private val miotDeviceClient = MiotDeviceClient(user)
-    private val _event = MutableSharedFlow<Event>()
-    val event = _event.asSharedFlow()
-    val manager = MiotDeviceManager.Companion.build(
-        miotDeviceClient,
-        specAttrProvider,
-        device,
-        ComposeIcons,
-        ComposeCache(),
-        ComposeTranslateHelper,
-        Dispatchers.Default,
-        this
-    )
+@KoinViewModel
+class DeviceViewModel(
+    @InjectedParam did: String,
+    resolveDeviceSession: ResolveDeviceSessionUseCase,
+    clientFactory: MiotClientFactory,
+    specAttrProvider: MiotSpecAttrProvider,
+    @UiDispatcher uiDispatcher: CoroutineDispatcher,
+    @DefaultDispatcher workDispatcher: CoroutineDispatcher,
+) : ViewModel(), MiotDeviceManager.Callback {
+    private val session = resolveDeviceSession(did)
+    private val mutableEvent = MutableSharedFlow<Event>()
+
+    val device = session?.device
+    val event = mutableEvent.asSharedFlow()
+    val manager: MiotDeviceManager? = session?.let {
+        MiotDeviceManager.build(
+            clientFactory.createDeviceClient(it.user),
+            specAttrProvider,
+            it.device,
+            ComposeIcons,
+            ComposeCache(),
+            ComposeTranslateHelper,
+            uiDispatcher,
+            workDispatcher,
+            this,
+        )
+    }
 
     override fun onDeviceInitiated() {
-        viewModelScope.launch {
-            _event.emit(Event.DeviceInitiated)
-        }
+        viewModelScope.launch { mutableEvent.emit(Event.DeviceInitiated) }
     }
 
     override fun onCleared() {
-        manager.stop()
+        manager?.stop()
         super.onCleared()
     }
 
     sealed interface Event {
-        object DeviceInitiated : Event
+        data object DeviceInitiated : Event
     }
 }

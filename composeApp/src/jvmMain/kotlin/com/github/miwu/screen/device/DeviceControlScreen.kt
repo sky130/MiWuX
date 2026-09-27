@@ -11,6 +11,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -29,10 +30,9 @@ import miwu.common.resources.ic_return
 import miwu.compose.Text
 import miwu.compose.Title
 import miwu.compose.wrapper.base.ComposeMiwuWrapper
-import miwu.miot.model.MiotUser
 import miwu.miot.model.miot.MiotDevice
-import miwu.support.base.MiwuWidget
-import miwu.support.base.MiwuWrapper
+import miwu.support.MiwuWidget
+import miwu.support.MiwuWrapper
 import miwu.support.manager.MiotDeviceManager
 import miwu.compose.basic.MiwuTheme
 import miwu.compose.wrapper.base.Zone
@@ -45,33 +45,37 @@ import org.koin.core.parameter.parametersOf
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DeviceControlScreen(
-    miotUser: MiotUser,
-    device: MiotDevice,
-    viewModel: DeviceViewModel = koinViewModel { parametersOf(miotUser, device) }
+    did: String,
+    viewModel: DeviceViewModel = koinViewModel { parametersOf(did) },
 ) {
+    val device = viewModel.device
+    val manager = viewModel.manager
+    if (device == null || manager == null) {
+        UnavailableDeviceScreen()
+        return
+    }
     val layout = remember { DeviceLayout() }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel) {
         viewModel.event.collect { event ->
             when (event) {
                 is DeviceInitiated -> {
-                    initDeviceLayout(viewModel.manager, layout)
+                    initDeviceLayout(manager, layout)
                 }
             }
         }
     }
-    LaunchedEffect(device) {
-        viewModel.manager.init()
+    LaunchedEffect(manager) {
+        manager.init()
+    }
+    DisposableEffect(manager) {
+        onDispose(manager::stop)
     }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MiwuTheme.colors.background)
     ) {
-        TitleBar(device) {
-            runCatching {
-                viewModel.manager.stop()
-            }
-        }
+        TitleBar(device)
         with(layout) {
             LazyColumn(
                 Modifier.padding(horizontal = 10.dp),
@@ -90,6 +94,21 @@ fun DeviceControlScreen(
     }
 }
 
+@Composable
+private fun UnavailableDeviceScreen() {
+    val backStack = LocalRootNavBackStack.current
+    Column(
+        modifier = Modifier.fillMaxSize().background(MiwuTheme.colors.background),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text("设备不可用，请返回后重试")
+        Box(Modifier.padding(12.dp).clickable { if (backStack.size > 1) backStack.removeLast() }) {
+            Text("返回")
+        }
+    }
+}
+
 fun MiwuWidget<*>.isValueList() = this::class.java.annotations.any { it is ValueList }
 
 @Suppress("UNCHECKED_CAST")
@@ -104,7 +123,7 @@ private fun createWrapper(miotWidget: MiwuWidget<*>): ComposeMiwuWrapper<*>? {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun TitleBar(device: MiotDevice, onBack: () -> Unit = {}) {
+fun TitleBar(device: MiotDevice) {
     val navController = LocalRootNavBackStack.current
     Row(
         modifier = Modifier
@@ -119,8 +138,7 @@ fun TitleBar(device: MiotDevice, onBack: () -> Unit = {}) {
                     indication = ripple(),
                     interactionSource = remember { MutableInteractionSource() })
                 {
-                    onBack()
-                    navController.removeLast()
+                    if (navController.size > 1) navController.removeLast()
                 }
         ) {
             Box(Modifier.padding(10.dp)) {
@@ -164,9 +182,9 @@ suspend fun initDeviceLayout(manager: MiotDeviceManager, layout: DeviceLayout) =
             }
     with(manager.layout) {
         Header(headerList::addWidget)
-        SubHeader(subHeaderList::addWidget)
+        HeaderPanel(subHeaderList::addWidget)
         Body(bodyList::addWidget)
-        SubFooter(subFooterList::addWidget)
+        FooterPanel(subFooterList::addWidget)
         Footer(footerList::addWidget)
         Unknown { /* TODO */ }
     }

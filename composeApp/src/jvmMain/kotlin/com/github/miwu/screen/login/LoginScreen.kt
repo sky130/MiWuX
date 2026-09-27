@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,7 @@ fun LoginScreen(
     loginViewModel: LoginViewModel = koinViewModel()
 ) {
     val snackState = LocalGlobalSnackState.current
+    val qrCode by loginViewModel.qrCode.collectAsState()
     LaunchedEffect(Unit) {
         loginViewModel.loadQrCode()
     }
@@ -38,14 +40,12 @@ fun LoginScreen(
         loginViewModel.event.collect { event ->
             when (event) {
                 is LoginViewModel.Event.LoginFailure -> {
-                    snackState.showMessage(event.e.message ?: "登录失败")
+                    snackState.showMessage(event.error.message ?: "登录失败")
                 }
 
                 is LoginViewModel.Event.LoginSuccess -> {
                     snackState.showMessage("登录成功")
                 }
-
-                is LoginViewModel.Event.ShowLoading -> Unit
             }
         }
     }
@@ -68,7 +68,7 @@ fun LoginScreen(
                 Text("扫码登录")
             }
             Text("使用小米账号登录至米屋")
-            loginViewModel.qrcode.onSuccess {
+            qrCode.onSuccess {
                 Box(Modifier.border(2.dp, MiwuTheme.colors.border, RoundedCornerShape(10.dp))) {
                     Image(
                         painter = rememberQrCodePainter(it),

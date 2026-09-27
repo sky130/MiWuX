@@ -2,82 +2,48 @@ package com.github.miwu.screen.main.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.miwu.logic.datastore.MiotUserDataStore
-import com.github.miwu.logic.datastore.serializer.MiotUserSerializer
-import com.github.miwu.logic.repository.AppRepository
-import com.github.miwu.logic.repository.CacheRepository
-import com.github.miwu.logic.repository.MiotRepository
-import com.github.miwu.logic.setting.AppSetting
-import fr.haan.resultat.Resultat
-import fr.haan.resultat.runCatchingL
-import kotlinx.coroutines.flow.*
+import com.github.miwu.domain.repository.DeviceMetadataRepository
+import com.github.miwu.domain.repository.HomeRepository
+import com.github.miwu.domain.repository.SettingsRepository
+import com.github.miwu.domain.usecase.device.GetSortedDevicesUseCase
+import com.github.miwu.domain.usecase.room.GetSortedRoomsUseCase
+import com.github.miwu.domain.usecase.scene.GetHomeScenesUseCase
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import miwu.miot.model.miot.MiotDevice
 import miwu.miot.model.miot.MiotHome
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.annotation.KoinViewModel
 
-class MainViewModel() : ViewModel(), KoinComponent {
-    private val miotRepository: MiotRepository by inject()
-    private val deviceRepository: CacheRepository by inject()
-    private val miotUserDataStore: MiotUserDataStore by inject()
-    private val appSetting: AppSetting by inject()
-
-    val currentHome = miotRepository.currentHome
-
-    val iconMap = deviceRepository.icons
-        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
-
-    val currentHomeId = appSetting.homeId.flow
-        .map { it.toString() }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.Eagerly,
-            appSetting.homeId.defaultValue.toString()
-        )
-
-
-    val homeList = miotRepository.homes
+@KoinViewModel
+class MainViewModel(
+    private val homeRepository: HomeRepository,
+    metadataRepository: DeviceMetadataRepository,
+    settingsRepository: SettingsRepository,
+    getSortedDevices: GetSortedDevicesUseCase,
+    getSortedRooms: GetSortedRoomsUseCase,
+    getHomeScenes: GetHomeScenesUseCase,
+) : ViewModel() {
+    val currentHome = homeRepository.currentHome
+    val userInfo = homeRepository.userInfo
+    val devices = getSortedDevices().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val rooms = getSortedRooms().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val scenes = getHomeScenes().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val iconMap = metadataRepository.metadata
+        .map { it.icons }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
+    val currentHomeId = settingsRepository.selectedHomeId
+        .map(Long::toString)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "0")
+    val homeList = homeRepository.homes
         .map { it.getOrNull().orEmpty() }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-
-    val miotUser = miotUserDataStore.data.stateIn(
-        viewModelScope,
-        SharingStarted.Eagerly,
-        MiotUserSerializer.defaultValue
-    )
-
-//    val deviceList: StateFlow<Resultat<List<Triple<MiotDevice, String, String>>>> = combine(
-//        appRepository.devices,
-//        deviceRepository.deviceMetadataHandler
-//    ) { devices, handler ->
-//        when {
-//            devices.isLoading -> Resultat.loading()
-//            else -> runCatchingL {
-//                devices.getOrNull()
-//                    .orEmpty()
-//                    .map { device ->
-//                        Triple(
-//                            device,
-//                            handler.getRoom(device.did),
-//                            handler.getIcon(device.model) ?: ""
-//                        )
-//                    }
-//            }
-//        }
-//    }.stateIn(
-//        viewModelScope,
-//        SharingStarted.Eagerly,
-//        Resultat.loading()
-//    )
-
-    fun isActiveHome(home: MiotHome): Boolean {
-        return runBlocking { appSetting.homeId.getValue().toString() == home.id }
+    fun setActiveHome(home: MiotHome) {
+        viewModelScope.launch { homeRepository.selectHome(home) }
     }
 
-    fun setActiveHome(miotHome: MiotHome) {
-        miotRepository.setActiveHome(miotHome)
+    fun refreshHome() {
+        viewModelScope.launch { homeRepository.refreshCurrentHome() }
     }
 }

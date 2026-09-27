@@ -3,7 +3,7 @@ package com.github.miwu.screen.device.support
 import kndroidx.setting.getAppDataDir
 import miwu.miot.kmp.utils.json
 import miwu.miot.kmp.utils.to
-import miwu.miot.model.att.SpecAtt
+import miwu.miot.model.spec.SpecAtt
 import miwu.support.api.Cache
 import java.io.File
 

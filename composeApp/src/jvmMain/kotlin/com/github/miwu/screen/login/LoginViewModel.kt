@@ -1,82 +1,65 @@
 package com.github.miwu.screen.login
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.github.miwu.logic.datastore.MiotUserDataStore
-import com.github.miwu.logic.setting.AppSetting
+import androidx.lifecycle.viewModelScope
+import com.github.miwu.domain.usecase.account.LoginUseCase
 import fr.haan.resultat.Resultat
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.launch
-import miwu.miot.model.MiotUser
-import miwu.miot.provider.MiotLoginProvider
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeoutException
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import miwu.miot.model.MiotUser
+import org.koin.core.annotation.KoinViewModel
 
-class LoginViewModel() : ViewModel(), KoinComponent {
-    private val _event = MutableSharedFlow<Event>()
-    private val appSetting: AppSetting by inject()
-    private val loginProvider: MiotLoginProvider by inject()
-    private val miotUserDataStore: MiotUserDataStore by inject()
-    val loginJob = Job()
-    val scope = CoroutineScope(loginJob)
-    var qrcode by mutableStateOf(Resultat.loading<String>())
-        private set
-    var miotUser by mutableStateOf<MiotUser?>(null)
-        private set
+@KoinViewModel
+class LoginViewModel(
+    private val loginUseCase: LoginUseCase,
+) : ViewModel() {
+    private val mutableEvent = MutableSharedFlow<Event>()
+    private val mutableQrCode = MutableStateFlow<Resultat<String>>(Resultat.loading())
+    private var loginJob: Job? = null
 
-    val event = _event.asSharedFlow()
+    val event = mutableEvent.asSharedFlow()
+    val qrCode = mutableQrCode.asStateFlow()
 
     fun loadQrCode() {
-        loginJob.cancelChildren()
-        scope.launch(Dispatchers.IO) {
-            runCatching {
-                qrcode = Resultat.loading()
-                val response = loginProvider
-                    .generateLoginQrCode()
-                    .getOrThrow()
-                val qr = response.toQrCode()
-                    ?: error("generate login qrcode failure, response=${response}")
-                qrcode = Resultat.success(qr.data)
-                loginProvider
-                    .loginByQrCode(qr.loginUrl)
-                    .getOrThrow()
-            }.onFailure { e ->
-                e.printStackTrace()
-                if (e is SocketTimeoutException || e is TimeoutException) {
-                    loadQrCode()
-                } else {
-                    loginFailure(e)
+        loginJob?.cancel()
+        loginJob = viewModelScope.launch {
+            while (true) {
+                currentCoroutineContext().ensureActive()
+                mutableQrCode.value = Resultat.loading()
+                try {
+                    val qrCode = loginUseCase.generateQrCode().getOrThrow()
+                    mutableQrCode.value = Resultat.success(qrCode.data)
+                    val user = loginUseCase.loginByQrCode(qrCode.loginUrl).getOrThrow()
+                    mutableEvent.emit(Event.LoginSuccess(user))
+                    return@launch
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (error: Throwable) {
+                    if (error.isTimeout()) continue
+                    mutableQrCode.value = Resultat.failure(error)
+                    mutableEvent.emit(Event.LoginFailure(error))
+                    return@launch
                 }
-            }.onSuccess { user ->
-                loginSuccess(user)
             }
         }
     }
 
-    private suspend fun loginSuccess(user: MiotUser) {
-        val user = user.copy(deviceId = appSetting.deviceId.getValue())
-        miotUserDataStore.updateData { user }
-        event(Event.LoginSuccess(user))
-    }
-
-    private suspend fun loginFailure(e: Throwable) {
-        event(Event.LoginFailure(e))
-    }
-
-    private suspend fun event(event: Event) = _event.emit(event)
+    private fun Throwable.isTimeout(): Boolean =
+        this is SocketTimeoutException ||
+            this is TimeoutException ||
+            this is io.ktor.client.network.sockets.SocketTimeoutException
 
     sealed interface Event {
         data class LoginSuccess(val user: MiotUser) : Event
-        data class LoginFailure(val e: Throwable) : Event
-        data class ShowLoading(val show: Boolean) : Event
+        data class LoginFailure(val error: Throwable) : Event
     }
 }

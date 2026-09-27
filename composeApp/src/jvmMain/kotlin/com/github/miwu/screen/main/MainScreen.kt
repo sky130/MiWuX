@@ -41,9 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.github.miwu.LocalGlobalSnackState
-import com.github.miwu.LocalMiotUser
 import com.github.miwu.LocalRootNavBackStack
-import com.github.miwu.logic.repository.entity.MiotHomeData
+import com.github.miwu.domain.model.HomeData
 import com.github.miwu.route.Route
 import com.github.miwu.screen.main.viewModel.MainViewModel
 import dev.vivvvek.seeker.Seeker
@@ -69,7 +68,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun MainScreen(viewModel: MainViewModel = koinViewModel()) {
     val currentHome by viewModel.currentHome.collectAsState()
-    var currentHomeData by rememberSaveable { mutableStateOf<MiotHomeData?>(null) }
+    var currentHomeData by remember { mutableStateOf<HomeData?>(null) }
     var currentRoom by rememberSaveable { mutableStateOf("") }
     val iconMap by viewModel.iconMap.collectAsState()
     LaunchedEffect(currentHome) {
@@ -97,23 +96,28 @@ fun MainScreen(viewModel: MainViewModel = koinViewModel()) {
                 is Success -> {
                     val home = home.value
                     val rooms = home.rooms.keys.toList()
-                    val pageState = rememberPagerState(0) { rooms.size }
-                    LaunchedEffect(currentRoom) {
-                        pageState.animateScrollToPage(rooms.indexOf(currentRoom))
-                    }
-                    RoomRow(currentRoom, rooms) {
-                        currentRoom = it
-                    }
-                    LaunchedEffect(pageState.targetPage) {
-                        currentRoom = rooms[pageState.targetPage]
-                    }
-                    HorizontalPager(
-                        pageState,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(top = 10.dp)
-                    ) { index ->
-                        DeviceGrid(home.rooms[rooms[index]].orEmpty(), iconMap, modifier = Modifier.weight(1f))
+                    if (rooms.isEmpty()) {
+                        Text("暂无房间数据")
+                    } else {
+                        val pageState = rememberPagerState(0) { rooms.size }
+                        LaunchedEffect(currentRoom) {
+                            val targetIndex = rooms.indexOf(currentRoom).coerceAtLeast(0)
+                            pageState.animateScrollToPage(targetIndex)
+                        }
+                        RoomRow(currentRoom, rooms) {
+                            currentRoom = it
+                        }
+                        LaunchedEffect(pageState.targetPage) {
+                            currentRoom = rooms[pageState.targetPage]
+                        }
+                        HorizontalPager(
+                            pageState,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(top = 10.dp)
+                        ) { index ->
+                            DeviceGrid(home.rooms[rooms[index]].orEmpty(), iconMap, modifier = Modifier.weight(1f))
+                        }
                     }
                 }
             }
@@ -129,7 +133,6 @@ fun DeviceGrid(
 ) {
     val snackState = LocalGlobalSnackState.current
     val backStack = LocalRootNavBackStack.current
-    val miotUser = LocalMiotUser.current
     LazyVerticalGrid(
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalArrangement = Arrangement.spacedBy(5.dp),
@@ -140,8 +143,8 @@ fun DeviceGrid(
         items(devices) { device ->
             Surface(
                 onClick = {
-                    if (device.isOnline || true)
-                        backStack.add(Route.Device(miotUser, device))
+                    if (device.isOnline)
+                        backStack.add(Route.Device(device.did))
                     else
                         snackState.showMessage("设备离线")
                 },
