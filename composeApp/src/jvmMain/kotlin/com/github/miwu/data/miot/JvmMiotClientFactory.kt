@@ -4,9 +4,9 @@ import com.github.miwu.domain.gateway.MiotClientFactory
 import miwu.miot.client.MiotDeviceClient
 import miwu.miot.client.MiotHomeClient
 import miwu.miot.client.MiotUserClient
-import miwu.miot.kmp.impl.client.MiotDeviceClientImpl
-import miwu.miot.kmp.impl.client.MiotHomeClientImpl
-import miwu.miot.kmp.impl.client.MiotUserClientImpl
+import miwu.miot.impl.client.MiotDeviceClientImpl
+import miwu.miot.impl.client.MiotHomeClientImpl
+import miwu.miot.impl.client.MiotUserClientImpl
 import miwu.miot.model.MiotUser
 import org.koin.core.annotation.Singleton
 

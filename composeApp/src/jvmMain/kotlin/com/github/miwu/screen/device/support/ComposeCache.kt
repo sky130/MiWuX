@@ -1,13 +1,24 @@
 package com.github.miwu.screen.device.support
 
 import kndroidx.setting.getAppDataDir
-import miwu.miot.kmp.utils.json
-import miwu.miot.kmp.utils.to
+import kotlinx.serialization.json.Json
 import miwu.miot.model.spec.SpecAtt
 import miwu.support.api.Cache
 import java.io.File
 
-class ComposeCache() : Cache {
+class ComposeCache : Cache {
+    companion object {
+        private val json = Json {
+            ignoreUnknownKeys = true
+            encodeDefaults = true
+        }
+
+        private inline fun <reified T> String.to(): Result<T> =
+            runCatching {
+                json.decodeFromString<T>(this)
+            }
+    }
+
     private val cacheDir: String = File(getAppDataDir("MiWuX"), "cache")
         .apply { if (!isDirectory) mkdir() }
         .absolutePath

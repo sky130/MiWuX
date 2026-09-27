@@ -70,7 +70,11 @@ kotlin {
             implementation(libs.kermit.koin)
             implementation(libs.slf4j.api)
             implementation(libs.miwu.miot.api)
-            implementation(libs.miwu.miot.api.kmp.impl)
+            // miot-api-kmp-impl 的 ktor 反序列化问题
+            // home_device_list 返回 HTTP 200，但响应类型是 text/plain
+            // 3.0.0-dev-9 未能将其转换成 MiotResponse
+            // 先切换回 jvm impl
+            implementation(libs.miwu.miot.api.impl)
             implementation(libs.miwu.support)
             implementation(libs.miwu.support.annotation)
             implementation(libs.miwu.dispatchers)
