@@ -9,6 +9,7 @@ import com.github.miwu.domain.repository.DeviceMetadataRepository
 import com.github.miwu.domain.repository.HomeRepository
 import com.github.miwu.domain.repository.ResultState
 import com.github.miwu.domain.repository.SettingsRepository
+import com.github.miwu.logging.Logger
 import fr.haan.resultat.Resultat
 import fr.haan.resultat.toResultat
 import kotlinx.coroutines.CancellationException
@@ -33,6 +34,7 @@ class HomeRepositoryImpl(
     private val clientFactory: MiotClientFactory,
     @AppScope applicationScope: CoroutineScope,
 ) : HomeRepository {
+    private val logger = Logger()
     private var homeClient: MiotHomeClient? = null
     private val cachedHomes = mutableMapOf<String, HomeData>()
     private val mutableHomes = MutableStateFlow<Resultat<List<MiotHome>>>(Resultat.loading())
@@ -51,19 +53,26 @@ class HomeRepositoryImpl(
         mutableCurrentHome.emit(Resultat.loading())
         val result = runCatchingSuspend {
             settingsRepository.selectHome(home.id.toLong(), home.uid)
-            cachedHomes[home.id] ?: error("Home ${home.id} is not loaded")
+            cachedHomes[home.id] ?: error("Selected home is not loaded")
         }
+        result.onSuccess { logger.info("Home selection succeeded") }
+            .onFailure { logger.error("Home selection failed", it) }
         mutableCurrentHome.emit(result.toResultat())
-        return result.map { Unit }
+        return result.map { }
     }
 
     override suspend fun runScene(scene: MiotScene): Result<Unit> = runCatchingSuspend {
         val client = homeClient ?: error("MiotHomeClient is not initialized")
         val home = homeDataLoader.getSceneHome(scene) ?: error("Scene home is not loaded")
         client.runScene(home, scene).rethrowCancellation().getOrThrow()
+    }.onSuccess {
+        logger.info("Scene execution succeeded")
+    }.onFailure {
+        logger.error("Scene execution failed", it)
     }
 
     override suspend fun refreshHomes() {
+        logger.info("Refreshing homes")
         mutableHomes.emit(Resultat.loading())
         val result = runCatchingSuspend {
             val client = homeClient ?: error("MiotHomeClient is not initialized")
@@ -73,6 +82,8 @@ class HomeRepositoryImpl(
             cachedHomes.putAll(homeDataLoader.load(client, homeList))
             homeList
         }
+        result.onSuccess { logger.info("Homes refreshed; count={}", it.size) }
+            .onFailure { logger.error("Refreshing homes failed", it) }
         mutableHomes.emit(result.toResultat())
 
         result.getOrNull()?.let { homeList ->
@@ -83,6 +94,7 @@ class HomeRepositoryImpl(
     }
 
     override suspend fun refreshCurrentHome() {
+        logger.info("Refreshing current home")
         mutableCurrentHome.emit(Resultat.loading())
         val result = runCatchingSuspend {
             val client = homeClient ?: error("MiotHomeClient is not initialized")
@@ -90,7 +102,16 @@ class HomeRepositoryImpl(
             val home = cachedHomes[homeId.toString()]?.home ?: error("Active home is not loaded")
             homeDataLoader.load(client, home)
         }
-        result.onSuccess { cachedHomes[it.home.id] = it }
+        result.onSuccess {
+            cachedHomes[it.home.id] = it
+            logger.info(
+                "Current home refreshed; devices={}, scenes={}",
+                it.devices.size,
+                it.scenes.size,
+            )
+        }.onFailure {
+            logger.error("Refreshing current home failed", it)
+        }
         mutableCurrentHome.emit(result.toResultat())
     }
 
@@ -98,6 +119,7 @@ class HomeRepositoryImpl(
         when (state) {
             LoginState.Success -> {
                 val user = accountRepository.currentUser ?: return
+                logger.info("Account session is ready; loading home data")
                 homeClient = clientFactory.createHomeClient(user)
                 refreshUserInfo(user)
                 refreshHomes()
@@ -113,12 +135,15 @@ class HomeRepositoryImpl(
             clientFactory.createUserClient(user).getUserInfo().rethrowCancellation().getOrThrow().result
         }.onSuccess {
             mutableUserInfo.emit(it)
+            logger.info("User profile refreshed")
         }.onFailure {
             mutableUserInfo.emit(EMPTY_USER_INFO)
+            logger.warn("Refreshing user profile failed", it)
         }
     }
 
     private suspend fun clearAccountState() {
+        logger.info("Clearing account-scoped home data")
         homeClient = null
         cachedHomes.clear()
         homeDataLoader.clear()

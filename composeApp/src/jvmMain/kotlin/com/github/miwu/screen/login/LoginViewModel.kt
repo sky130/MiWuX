@@ -3,6 +3,7 @@ package com.github.miwu.screen.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.miwu.domain.usecase.account.LoginUseCase
+import com.github.miwu.logging.Logger
 import fr.haan.resultat.Resultat
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeoutException
@@ -22,6 +23,7 @@ import org.koin.core.annotation.KoinViewModel
 class LoginViewModel(
     private val loginUseCase: LoginUseCase,
 ) : ViewModel() {
+    private val logger = Logger()
     private val mutableEvent = MutableSharedFlow<Event>()
     private val mutableQrCode = MutableStateFlow<Resultat<String>>(Resultat.loading())
     private var loginJob: Job? = null
@@ -30,6 +32,7 @@ class LoginViewModel(
     val qrCode = mutableQrCode.asStateFlow()
 
     fun loadQrCode() {
+        logger.info("Starting QR code login")
         loginJob?.cancel()
         loginJob = viewModelScope.launch {
             while (true) {
@@ -37,14 +40,20 @@ class LoginViewModel(
                 mutableQrCode.value = Resultat.loading()
                 try {
                     val qrCode = loginUseCase.generateQrCode().getOrThrow()
+                    logger.info("QR code loaded; waiting for authentication")
                     mutableQrCode.value = Resultat.success(qrCode.data)
                     val user = loginUseCase.loginByQrCode(qrCode.loginUrl).getOrThrow()
+                    logger.info("QR code login succeeded")
                     mutableEvent.emit(Event.LoginSuccess(user))
                     return@launch
                 } catch (error: CancellationException) {
                     throw error
                 } catch (error: Throwable) {
-                    if (error.isTimeout()) continue
+                    if (error.isTimeout()) {
+                        logger.info("QR code login timed out; retrying")
+                        continue
+                    }
+                    logger.error("QR code login failed", error)
                     mutableQrCode.value = Resultat.failure(error)
                     mutableEvent.emit(Event.LoginFailure(error))
                     return@launch

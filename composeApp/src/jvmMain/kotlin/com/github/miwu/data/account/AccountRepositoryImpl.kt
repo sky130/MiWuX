@@ -7,6 +7,7 @@ import com.github.miwu.domain.gateway.MiotClientFactory
 import com.github.miwu.domain.model.LoginState
 import com.github.miwu.domain.repository.AccountRepository
 import com.github.miwu.domain.repository.SettingsRepository
+import com.github.miwu.logging.Logger
 import java.util.concurrent.atomic.AtomicReference
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -32,6 +33,7 @@ class AccountRepositoryImpl(
     private val clientFactory: MiotClientFactory,
     @AppScope applicationScope: CoroutineScope,
 ) : AccountRepository {
+    private val logger = Logger()
     private val userReference = AtomicReference<MiotUser?>(null)
     private val mutableLoginState = MutableStateFlow<LoginState>(LoginState.Loading)
 
@@ -45,6 +47,7 @@ class AccountRepositoryImpl(
             .onEach(::validateStoredUser)
             .catch { error ->
                 if (error is CancellationException) throw error
+                logger.error("Reading stored credentials failed", error)
                 userReference.set(null)
                 mutableLoginState.emit(LoginState.Failure(error.message ?: "unknown", error))
             }
@@ -52,32 +55,50 @@ class AccountRepositoryImpl(
     }
 
     override suspend fun saveUser(user: MiotUser): MiotUser {
-        val storedUser = user.copy(deviceId = settingsRepository.getOrCreateDeviceId())
-        dataStore.updateData { storedUser }
-        userReference.set(storedUser)
-        mutableLoginState.emit(LoginState.Success)
-        return storedUser
+        try {
+            val storedUser = user.copy(deviceId = settingsRepository.getOrCreateDeviceId())
+            dataStore.updateData { storedUser }
+            userReference.set(storedUser)
+            mutableLoginState.emit(LoginState.Success)
+            logger.info("Credentials stored")
+            return storedUser
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Throwable) {
+            logger.error("Storing credentials failed", error)
+            throw error
+        }
     }
 
     override suspend fun logout() {
-        dataStore.updateData { MiotUserSerializer.defaultValue }
+        try {
+            dataStore.updateData { MiotUserSerializer.defaultValue }
+            logger.info("Credentials cleared")
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Throwable) {
+            logger.error("Clearing credentials failed", error)
+            throw error
+        }
     }
 
     private suspend fun validateStoredUser(storedUser: MiotUser) {
         mutableLoginState.emit(LoginState.Loading)
         val user = storedUser.copy(deviceId = settingsRepository.getOrCreateDeviceId())
         if (!user.hasCredentials()) {
+            logger.info("Stored credentials are unavailable")
             userReference.set(null)
             mutableLoginState.emit(LoginState.LoggedOut)
             return
         }
 
         userReference.set(user)
-        val tokenValid = clientFactory.createUserClient(user)
+        val validationResult = clientFactory.createUserClient(user)
             .getIsServiceTokenValid()
             .rethrowCancellation()
-            .getOrNull()
-            ?: false
+        validationResult.onFailure { logger.warn("Stored credential validation failed", it) }
+        val tokenValid = validationResult.getOrNull() ?: false
+        logger.info("Stored credential validation completed; valid={}", tokenValid)
         if (tokenValid) {
             mutableLoginState.emit(LoginState.Success)
         } else {
@@ -86,10 +107,15 @@ class AccountRepositoryImpl(
     }
 
     private suspend fun refreshToken(user: MiotUser) {
+        logger.info("Refreshing credentials")
         loginProvider.refreshServiceToken(user)
             .rethrowCancellation()
-            .onSuccess { saveUser(it) }
+            .onSuccess {
+                logger.info("Credential refresh succeeded")
+                saveUser(it)
+            }
             .onFailure { error ->
+                logger.error("Credential refresh failed", error)
                 mutableLoginState.emit(error.toLoginState())
             }
     }

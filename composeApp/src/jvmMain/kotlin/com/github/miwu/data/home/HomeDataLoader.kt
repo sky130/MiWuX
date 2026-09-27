@@ -2,6 +2,7 @@ package com.github.miwu.data.home
 
 import com.github.miwu.domain.model.HomeData
 import com.github.miwu.domain.repository.DeviceMetadataRepository
+import com.github.miwu.logging.Logger
 import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -22,6 +23,7 @@ class HomeDataLoader(
     private val metadataRepository: DeviceMetadataRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
+    private val logger = Logger()
     private val sceneHomes = ConcurrentHashMap<MiotScene, MiotHome>()
 
     suspend fun load(client: MiotHomeClient, homes: List<MiotHome>): Map<String, HomeData> =
@@ -31,6 +33,7 @@ class HomeDataLoader(
                 homes.map { home -> async { loadHome(client, home).let { home.id to it } } }
                     .awaitAll()
                     .toMap()
+                    .also { logger.info("Home data loaded; homes={}", it.size) }
             }
         }
 
@@ -44,8 +47,9 @@ class HomeDataLoader(
     }
 
     private suspend fun loadHome(client: MiotHomeClient, home: MiotHome): HomeData {
-        val devices = client.getDevices(home)
-            .rethrowCancellation()
+        val devicesResult = client.getDevices(home).rethrowCancellation()
+        devicesResult.onFailure { logger.error("Loading home devices failed", it) }
+        val devices = devicesResult
             .getOrThrow()
             .result
             .deviceInfo
@@ -58,14 +62,16 @@ class HomeDataLoader(
         metadataRepository.updateRooms(roomByDevice)
         metadataRepository.ensureIcons(devices.map(MiotDevice::model))
 
-        val scenes = client.getScenes(home)
-            .rethrowCancellation()
+        val scenesResult = client.getScenes(home).rethrowCancellation()
+        scenesResult.onFailure { logger.error("Loading home scenes failed", it) }
+        val scenes = scenesResult
             .getOrThrow()
             .result
             .scenes
             .orEmpty()
             .sortedBy(MiotScene::name)
         sceneHomes.putAll(scenes.associateWith { home })
+        logger.info("Loaded home details; devices={}, scenes={}", devices.size, scenes.size)
 
         return HomeData(
             home = home,

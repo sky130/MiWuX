@@ -2,6 +2,7 @@ package com.github.miwu.data.metadata
 
 import com.github.miwu.domain.model.DeviceMetadata
 import com.github.miwu.domain.repository.DeviceMetadataRepository
+import com.github.miwu.logging.Logger
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +19,7 @@ class DeviceMetadataRepositoryImpl(
     private val specAttrProvider: MiotSpecAttrProvider,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : DeviceMetadataRepository {
+    private val logger = Logger()
     private val mutex = Mutex()
     private val mutableMetadata = MutableStateFlow(DeviceMetadata())
     override val metadata: StateFlow<DeviceMetadata> = mutableMetadata.asStateFlow()
@@ -28,10 +30,19 @@ class DeviceMetadataRepositoryImpl(
 
         val icons = missingModels.mapNotNull { model ->
             specAttrProvider.getIconUrl(model)
-                .getOrNull()
-                ?.takeIf(String::isNotEmpty)
-                ?.let { model to it }
+                .fold(
+                    onSuccess = { url -> url.takeIf(String::isNotEmpty)?.let { model to it } },
+                    onFailure = {
+                        logger.warn("Device icon lookup failed", it)
+                        null
+                    },
+                )
         }
+        logger.info(
+            "Device icon lookup completed; requested={}, loaded={}",
+            missingModels.size,
+            icons.size,
+        )
         if (icons.isEmpty()) return@withContext
 
         mutex.withLock {

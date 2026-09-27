@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.miwu.domain.gateway.MiotClientFactory
 import com.github.miwu.domain.usecase.device.ResolveDeviceSessionUseCase
+import com.github.miwu.logging.Logger
 import com.github.miwu.screen.device.support.ComposeCache
 import com.github.miwu.screen.device.support.ComposeTranslateHelper
 import kotlinx.coroutines.CoroutineDispatcher
@@ -27,6 +28,7 @@ class DeviceViewModel(
     @UiDispatcher uiDispatcher: CoroutineDispatcher,
     @DefaultDispatcher workDispatcher: CoroutineDispatcher,
 ) : ViewModel(), MiotDeviceManager.Callback {
+    private val logger = Logger()
     private val session = resolveDeviceSession(did)
     private val mutableEvent = MutableSharedFlow<Event>()
 
@@ -46,11 +48,21 @@ class DeviceViewModel(
         )
     }
 
+    init {
+        if (session == null) {
+            logger.warn("Device session could not be resolved")
+        } else {
+            logger.info("Device session resolved; manager initialized={}", manager != null)
+        }
+    }
+
     override fun onDeviceInitiated() {
+        logger.info("Device manager reported initialization")
         viewModelScope.launch { mutableEvent.emit(Event.DeviceInitiated) }
     }
 
     override fun onCleared() {
+        logger.info("Stopping device manager")
         manager?.stop()
         super.onCleared()
     }

@@ -22,6 +22,8 @@ navigation3-runtime-jvmstubs = "1.0.0-alpha06"
 uiDesktop = "1.7.0"
 composenativetray = "2.1.6"
 nucleus = "2.5.5"
+kermit = "2.2.0"
+slf4j = "2.0.19"
 
 [libraries]
 # ComposeNativeTray
@@ -30,6 +32,13 @@ composeNativeTray-app = { module = "dev.nucleusframework:composenativetray-app",
 
 nucleus-application = { module = "dev.nucleusframework:nucleus.nucleus-application", version.ref = "nucleus" }
 nucleus-decorated-window-tao = { module = "dev.nucleusframework:nucleus.decorated-window-tao", version.ref = "nucleus" }
+
+# Logging
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+kermit-io = { module = "co.touchlab:kermit-io", version.ref = "kermit" }
+kermit-koin = { module = "co.touchlab:kermit-koin", version.ref = "kermit" }
+kermit-test = { module = "co.touchlab:kermit-test", version.ref = "kermit" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }

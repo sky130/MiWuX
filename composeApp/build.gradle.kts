@@ -65,6 +65,10 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
             implementation(libs.qrose)
+            implementation(libs.kermit)
+            implementation(libs.kermit.io)
+            implementation(libs.kermit.koin)
+            implementation(libs.slf4j.api)
             implementation(libs.miwu.miot.api)
             implementation(libs.miwu.miot.api.kmp.impl)
             implementation(libs.miwu.support)
@@ -72,6 +76,9 @@ kotlin {
             implementation(libs.miwu.dispatchers)
             // implementation(libs.androidx.navigation3.runtime.jvmstubs)
             // implementation(libs.miwu.support.processor)
+        }
+        jvmTest.dependencies {
+            implementation(libs.kermit.test)
         }
     }
 }
