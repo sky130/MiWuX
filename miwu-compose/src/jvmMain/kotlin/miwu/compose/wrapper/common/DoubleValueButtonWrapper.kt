@@ -27,8 +27,8 @@ import miwu.compose.border
 import miwu.compose.ripple
 import miwu.compose.wrapper.base.ComposeMiwuWrapper
 import miwu.compose.wrapper.base.Zone
-import miwu.support.base.MiwuWidget
-import miwu.support.unit.Unit
+import miwu.support.MiwuWidget
+import miwu.support.unit.ValueUnit
 import miwu.widget.DoubleValueController
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -37,7 +37,7 @@ import org.jetbrains.compose.resources.painterResource
 class DoubleValueButtonWrapper(widget: MiwuWidget<Double>) : ComposeMiwuWrapper<Double>(widget) {
     private var value by mutableStateOf(16.0)
     private val unit = when (valueOriginUnit) {
-        Unit.Celsius -> "°"
+        ValueUnit.Celsius -> "°"
         else -> valueUnit
     }
 

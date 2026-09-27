@@ -2,8 +2,8 @@ package miwu.compose.wrapper.base
 
 import androidx.compose.runtime.Composable
 import miwu.compose.icon.miwuIconPainter
-import miwu.support.base.MiwuWidget
-import miwu.support.base.MiwuWrapper
+import miwu.support.MiwuWidget
+import miwu.support.MiwuWrapper
 
 abstract class ComposeMiwuWrapper<T>(widget: MiwuWidget<T>) : MiwuWrapper<T>(widget) {
 

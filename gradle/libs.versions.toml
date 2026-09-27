@@ -3,18 +3,19 @@ androidx-lifecycle = "2.10.0-alpha08"
 compose-hotReload = "1.1.0-alpha05"
 compose-multiplatform = "1.10.1"
 junit = "4.13.2"
-kotlin = "2.3.0"
+kotlin = "2.3.21"
 kotlinx-coroutines = "1.10.2"
-miwu = "3.0.0-dev-6"
+miwu = "3.0.0-dev-9"
 kotlinpoet = "2.2.0"
 ksp = "2.3.4"
-koin-bom = "4.1.0"
+koin-bom = "4.2.2"
+koin-plugin = "1.1.0"
 qrose = "1.0.1"
 resultat = "1.0.0"
 russhwolf-multiplatform-settings = "1.3.0"
 datastore-core-jvm = "1.1.7"
 symbol-processing-api = "2.3.5"
-jetbrains-kotlin-jvm = "2.3.0"
+jetbrains-kotlin-jvm = "2.3.21"
 ktor = "3.4.0"
 lifecycle-viewmodel-navigation3 = "2.10.0-alpha08"
 coil = "3.3.0"
@@ -45,18 +46,22 @@ miwu-support = { module = "io.github.sky130.miwu:miwu-support", version.ref = "m
 miwu-support-annotation = { module = "io.github.sky130.miwu:miwu-support-annotation", version.ref = "miwu" }
 miwu-android-processor = { module = "io.github.sky130.miwu:miwu-icon-android-processor", version.ref = "miwu" }
 miwu-support-processor = { module = "io.github.sky130.miwu:miwu-support-processor", version.ref = "miwu" }
+miwu-dispatchers = { module = "io.github.sky130.miwu:miwu-dispatchers", version.ref = "miwu" }
 
 
 squareup-kotlinpoet-ksp = { module = "com.squareup:kotlinpoet-ksp", version.ref = "kotlinpoet" }
 square-kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 
 
+# koin libraries
+koin-android = { module = "io.insert-koin:koin-android" }
+koin-android-compat = { module = "io.insert-koin:koin-android-compat" }
+koin-compose = { module = "io.insert-koin:koin-compose" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
-koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin-bom" }
-koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-bom" }
-koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin-bom" }
-koin-compose-viewmodel-navigation = { module = "io.insert-koin:koin-compose-viewmodel-navigation", version.ref = "koin-bom" }
-
+koin-core = { module = "io.insert-koin:koin-core" }
+koin-core-viewmodel = { module = "io.insert-koin:koin-core-viewmodel" }
+koin-annotations = { module = "io.insert-koin:koin-annotations" }
 
 qrose = { module = "io.github.alexzhirkevich:qrose", version.ref = "qrose" }
 resultat = { module = "fr.haan.resultat:resultat", version.ref = "resultat" }
@@ -99,4 +104,5 @@ compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-m
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrains-kotlin-jvm" }
-
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }

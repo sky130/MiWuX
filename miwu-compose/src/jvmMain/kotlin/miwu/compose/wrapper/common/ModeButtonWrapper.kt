@@ -24,7 +24,7 @@ import miwu.compose.basic.MiwuTheme
 import miwu.compose.ripple
 import miwu.compose.wrapper.base.ComposeMiwuWrapper
 import miwu.compose.wrapper.base.Zone
-import miwu.support.base.MiwuWidget
+import miwu.support.MiwuWidget
 import miwu.widget.ModeButton
 import miwu.widget.SwitchButton
 

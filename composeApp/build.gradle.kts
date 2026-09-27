@@ -5,7 +5,8 @@ plugins {
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.compose.hotReload)
-    kotlin("plugin.serialization") version "2.3.0"
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.koin.compiler)
 }
 
 kotlin {
@@ -33,6 +34,7 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.core)
+            implementation(libs.koin.annotations)
 
 
             implementation(libs.resultat)
@@ -63,6 +65,7 @@ kotlin {
             implementation(libs.miwu.miot.api.kmp.impl)
             implementation(libs.miwu.support)
             implementation(libs.miwu.support.annotation)
+            implementation(libs.miwu.dispatchers)
             // implementation(libs.androidx.navigation3.runtime.jvmstubs)
             // implementation(libs.miwu.support.processor)
         }

@@ -29,10 +29,10 @@ import miwu.compose.basic.MiwuTheme
 import miwu.compose.border
 import miwu.compose.ripple
 import miwu.compose.wrapper.base.ComposeMiwuWrapper
-import miwu.support.base.MiwuWidget
-import miwu.widget.Switch
+import miwu.support.MiwuWidget
+import miwu.widget.SwitchBar
 
-@Wrapper(Switch::class)
+@Wrapper(SwitchBar::class)
 class SwitchWrapper(widget: MiwuWidget<Boolean>) : ComposeMiwuWrapper<Boolean>(widget) {
     private var value by mutableStateOf(false)
 

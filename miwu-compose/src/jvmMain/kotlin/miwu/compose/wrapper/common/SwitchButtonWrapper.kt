@@ -23,7 +23,7 @@ import miwu.compose.border
 import miwu.compose.ripple
 import miwu.compose.wrapper.base.ComposeMiwuWrapper
 import miwu.compose.wrapper.base.Zone
-import miwu.support.base.MiwuWidget
+import miwu.support.MiwuWidget
 import miwu.widget.SwitchButton
 
 @Wrapper(SwitchButton::class)

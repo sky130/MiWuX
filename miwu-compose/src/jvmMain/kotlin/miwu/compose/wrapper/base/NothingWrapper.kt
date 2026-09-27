@@ -2,7 +2,7 @@ package miwu.compose.wrapper.base
 
 import androidx.compose.runtime.Composable
 import miwu.annotation.Wrapper
-import miwu.support.base.MiwuWidget
+import miwu.support.MiwuWidget
 
 /**
  * 可以根据这个模板来实现新的 Wrapper

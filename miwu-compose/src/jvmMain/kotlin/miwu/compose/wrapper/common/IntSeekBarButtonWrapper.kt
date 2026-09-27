@@ -21,8 +21,7 @@ import miwu.common.resources.ic_up
 import miwu.compose.*
 import miwu.compose.wrapper.base.ComposeMiwuWrapper
 import miwu.compose.wrapper.base.Zone
-import miwu.support.base.MiwuWidget
-import miwu.support.unit.Unit
+import miwu.support.MiwuWidget
 import miwu.widget.IntSeekbar
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource

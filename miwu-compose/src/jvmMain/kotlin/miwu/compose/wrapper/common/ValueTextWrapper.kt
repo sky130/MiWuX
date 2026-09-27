@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import miwu.annotation.Wrapper
 import miwu.compose.wrapper.base.ComposeMiwuWrapper
-import miwu.support.base.MiwuWidget
+import miwu.support.MiwuWidget
 import miwu.compose.basic.MiwuTheme
 import miwu.widget.StatusText
 
