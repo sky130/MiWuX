@@ -33,5 +33,5 @@ kotlin {
 compose.resources {
     publicResClass = true
     packageOfResClass = "miwu.common.resources"
-    generateResClass = auto
+    generateResClass = always
 }

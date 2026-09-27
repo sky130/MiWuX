@@ -1,4 +1,4 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import dev.nucleusframework.desktop.application.dsl.TargetFormat
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.compose.hotReload)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.koin.compiler)
+    alias(libs.plugins.nucleus)
 }
 
 kotlin {
@@ -56,7 +57,10 @@ kotlin {
         }
         jvmMain.dependencies {
             // implementation(libs.androidx.ui.desktop)
-            implementation("io.github.kdroidfilter:composenativetray:1.1.0")
+            implementation(libs.composeNativeTray.app)
+            implementation(libs.composeNativeTray)
+            implementation(libs.nucleus.application)
+            implementation(libs.nucleus.decorated.window.tao)
             implementation(libs.androidx.datastore.core.jvm)
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
@@ -72,14 +76,15 @@ kotlin {
     }
 }
 
-compose.desktop {
-    application {
-        mainClass = "com.github.miwu.MainKt"
+nucleus.application {
+    mainClass = "com.github.miwu.MainKt"
+    if (System.getProperty("os.name").startsWith("Mac", ignoreCase = true)) {
+        jvmArgs("-XstartOnFirstThread")
+    }
 
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.github.miwu"
-            packageVersion = "1.0.0"
-        }
+    nativeDistributions {
+        targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+        packageName = "com.github.miwu"
+        packageVersion = "1.0.0"
     }
 }

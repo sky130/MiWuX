@@ -13,7 +13,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -21,7 +20,6 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import miwu.common.resources.Res
 import miwu.common.resources.ic_close
-import miwu.common.resources.ic_dry
 import miwu.compose.basic.LocalColor
 import miwu.compose.basic.MiwuTheme
 import org.jetbrains.compose.resources.painterResource
