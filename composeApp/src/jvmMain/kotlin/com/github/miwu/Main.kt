@@ -9,9 +9,9 @@ import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.koin.KermitKoinLogger
 import com.github.miwu.logging.Logger
 import com.github.miwu.logging.Logging
+import com.github.miwu.tray.DecoratedTrayApp
 import dev.nucleusframework.application.NucleusBackend
 import dev.nucleusframework.application.nucleusApplication
-import dev.nucleusframework.composenativetray.trayapp.TrayApp
 import dev.nucleusframework.composenativetray.trayapp.rememberTrayAppState
 import miwu.common.resources.Res
 import miwu.common.resources.ic_miwu_round
@@ -41,7 +41,7 @@ fun main() {
             val state = rememberTrayAppState(
                 initialWindowSize = DpSize(300.dp, 600.dp),
             )
-            TrayApp(
+            DecoratedTrayApp(
                 windowsIcon = painterResource(Res.drawable.ic_miwu_round),
                 macLinuxIcon = vectorResource(Res.drawable.ic_miwu_tray),
                 tooltip = "MiWuX",
